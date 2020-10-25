@@ -1,13 +1,8 @@
 const router = require('express').Router()
 const { WebClient } = require('@slack/web-api')
-const SlackWeb = new WebClient(process.env.SLACK_TOKEN)
+const Slack = new WebClient(process.env.SLACK_TOKEN)
 
 router.post('/first', async (req, res) => {
-
-	return res.json({
-		ip: req.ip,
-		geo: req.geo,
-	})
 
 	let text = req.body.text
 
@@ -16,15 +11,15 @@ router.post('/first', async (req, res) => {
 	const channel = "#cx"
   
 	let envelope = {
-		username: "KK",
+		username: "Chat",
 		text:  `${city}, ${country}`,
 		channel
 	}
   
-	const main = await SlackWeb.chat.postMessage(envelope)
+	const main = await Slack.chat.postMessage(envelope)
 	
-	const name = 'NA'
-	const email = 'NA'
+	const name = 'N/A'
+	const email = 'N/A'
   
 	const attachments = [
 		{
@@ -84,7 +79,7 @@ router.post('/first', async (req, res) => {
 	  attachments
 	}
   
-	const contact = await SlackWeb.chat.postMessage(envelope)
+	const contact = await Slack.chat.postMessage(envelope)
   
 	envelope = {
 	  channel,
@@ -92,7 +87,7 @@ router.post('/first', async (req, res) => {
 	  text,
 	}
   
-	const first = await SlackWeb.chat.postMessage(envelope)
+	const first = await Slack.chat.postMessage(envelope)
   
 	return res.json({
 	  main,
@@ -116,8 +111,8 @@ router.post('/contact', async (req, res) => {
 	  ts: "1603545320.012900"
 	}
   
-	await SlackWeb.chat.update(envelope)
-  
+	await Slack.chat.update(envelope)
+
 	const attachments = [
 		{
 			color: "#35373B",
@@ -176,7 +171,7 @@ router.post('/contact', async (req, res) => {
 	  attachments
 	}
   
-	await SlackWeb.chat.update(envelope)
+	await Slack.chat.update(envelope)
   
 	return res.send("OK")
   
@@ -191,7 +186,7 @@ router.post('/event', async (req, res) => {
 	  channel
 	}
   
-	await SlackWeb.chat.postMessage(envelope)
+	await Slack.chat.postMessage(envelope)
   
 	return res.send(req.body.challenge)
   
