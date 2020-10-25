@@ -1,6 +1,7 @@
 const { WebClient } = require('@slack/web-api')
 const Slack = new WebClient(process.env.SLACK_TOKEN)
 const GeoIp = require('geoip-lite')
+const UserAgent = require('express-useragent')
 
 module.exports = (io, socket) => {
 
@@ -17,7 +18,7 @@ module.exports = (io, socket) => {
 
         const geo = GeoIp.lookup(ip) || { city: '', country: '' }
 
-        const { city, country } = geo
+        const ua = UserAgent.parse(socket.request.headers['user-agent'])
     
         const channel = "#cx"
 
@@ -37,7 +38,7 @@ module.exports = (io, socket) => {
     
         envelope = {
             username: "Chat",
-            text:  `${city}, ${country}`,
+            text:  `${geo.city}, ${geo.country}`,
             channel
         }
     
@@ -62,6 +63,10 @@ module.exports = (io, socket) => {
                             {
                                 type: "mrkdwn",
                                 text: `*Email:*\n ${email}`
+                            },
+                            {
+                                type: 'mrkdwn',
+                                text: `*OS:*\n ${ua.os}`
                             }
                         ]
                     }
