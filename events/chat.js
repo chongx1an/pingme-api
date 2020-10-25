@@ -11,7 +11,7 @@ module.exports = (io, socket) => {
         let text = data.text
 
         // const ip = socket.request.connection.remoteAddress.replace('::ffff:', '')
-        const ip = socket.handshake.address
+        const ip = socket.handshake.headers['x-forwarded-for']
 
         console.log(`Message received from ${ip}: ${data.text}`)
 
