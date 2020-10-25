@@ -97,6 +97,20 @@ router.post('/first', async (req, res) => {
   
 })
 
+router.post('/subsequent', async (req, res) => {
+
+	const envelope = {
+		channel: '#cx',
+		thread_ts: req.body.ts,
+		text: req.body.text,
+	}
+
+	const message = await Slack.chat.postMessage(envelope)
+
+	return res.json({ message })
+
+})
+
 router.post('/contact', async (req, res) => {
 
 	const { name, email } = req.body
