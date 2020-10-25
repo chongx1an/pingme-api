@@ -1,7 +1,6 @@
 const express = require('express')
-const router  = require('./routes/routes')
-const RequestIp = require('@supercharge/request-ip')
-const geoip = require('geoip-lite');
+const router  = require('./routers')
+require('dotenv').config()
 
 const app  = express()
 const port = process.env.APP_PORT || 3000
@@ -14,22 +13,6 @@ app.use(
 
 app.use(express.json())
 
-const getClientInfo = function (req, res, next) {  
-
-  // ip = RequestIp.getClientIp(req)
-  ip = '60.52.31.157'
-
-  geo = geoip.lookup(ip)
-
-  req.ip = ip
-  req.geo = geo
-
-  next()
-
-}
-
-app.use(getClientInfo)
-
 app.use('/', router)
 
-app.listen(port)
+app.listen(port, () => console.log('Server is listening on port ' + port))
