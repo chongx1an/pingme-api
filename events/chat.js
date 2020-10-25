@@ -10,7 +10,7 @@ module.exports = (io, socket) => {
       
         let text = data.text
 
-        const ip = socket.request.connection.remoteAddress
+        const ip = socket.request.connection.remoteAddress.replace('::ffff:', '')
 
         console.log(`Message received from ${ip}: ${data.text}`)
 
