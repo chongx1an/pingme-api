@@ -18,4 +18,8 @@ app.use('/', router)
 
 const port = process.env.PORT || 3000
 
-app.listen(port, () => console.log('Server is listening on port ' + port))
+const server = require('http').createServer(app)
+const io = require('socket.io')(server)
+require('./events')(io)
+
+server.listen(port, () => console.log('Server is listening on port ' + port))
