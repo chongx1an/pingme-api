@@ -3,6 +3,14 @@ const GeoIp = require('geoip-lite')
 
 module.exports = async (req, res, next) => {
 
+    if(req.session.views) {
+        req.session.views++
+    } else {
+        req.session.views = 1
+    }
+
+    console.log(req.session.views)
+
     // let ip = RequestIp.getClientIp(req)
     // let ip = '60.52.31.157'
 
