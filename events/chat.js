@@ -4,7 +4,7 @@ const GeoIp = require('geoip-lite')
 
 module.exports = (io, socket) => {
 
-    socket.on('sendMessage', async (data) => {
+    socket.on('sendMessage', async data => {
 
         let envelope
       
@@ -116,8 +116,12 @@ module.exports = (io, socket) => {
         const first = await Slack.chat.postMessage(envelope)
       
     })
+
+    socket.on('receiveMessage', async data => {
+
+    })
   
-    socket.on('formSubmitted', async (data) => {
+    socket.on('formSubmitted', async data => {
   
 
 
