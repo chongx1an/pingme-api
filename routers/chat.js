@@ -4,6 +4,11 @@ const SlackWeb = new WebClient(process.env.SLACK_TOKEN)
 
 router.post('/first', async (req, res) => {
 
+	return res.json({
+		ip: req.ip,
+		geo: req.geo,
+	})
+
 	let text = req.body.text
 
 	const { city, country } = req.geo

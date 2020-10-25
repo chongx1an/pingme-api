@@ -1,12 +1,19 @@
 const RequestIp = require('@supercharge/request-ip')
-const geoip = require('geoip-lite');
+const GeoIp = require('geoip-lite')
 
 module.exports = async (req, res, next) => {
 
-    // ip = RequestIp.getClientIp(req)
-    ip = '60.52.31.157'
+    // let ip = RequestIp.getClientIp(req)
+    // let ip = '60.52.31.157'
 
-    geo = geoip.lookup(ip)
+    let ip = (req.headers['x-forwarded-for'] || '').split(',').pop().trim() || 
+        req.connection.remoteAddress || 
+        req.socket.remoteAddress || 
+        (req.connection.socket ? req.connection.socket.remoteAddress : '127.0.0.1')
+
+    console.log(ip)
+
+    let geo = GeoIp.lookup(ip)
 
     req.ip = ip
     req.geo = geo
