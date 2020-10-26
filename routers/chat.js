@@ -2,21 +2,31 @@ const router = require('express').Router()
 const { WebClient } = require('@slack/web-api')
 const Slack = new WebClient(process.env.SLACK_TOKEN)
 
-router.post('/first', async (req, res) => {
+router.post('/', async (req, res) => {
 
 	let text = req.body.text
+  
+	const channel = "#cx"
+
+	if(req.body.ts) {
+
+		await Slack.chat.postMessage({
+			channel,
+			text,
+			thread_ts: req.body.ts,
+		})
+
+		return res.json({ ts: req.body.ts })
+
+	}
 
 	const { city, country } = req.geo
   
-	const channel = "#cx"
-  
-	let envelope = {
+	const main = await Slack.chat.postMessage({
 		username: "Chat",
 		text:  `${city}, ${country}`,
 		channel
-	}
-  
-	const main = await Slack.chat.postMessage(envelope)
+	})
 	
 	const name = 'N/A'
 	const email = 'N/A'
@@ -72,28 +82,20 @@ router.post('/first', async (req, res) => {
 			]
 	  	}
 	]
-	
-	envelope = {
-	  channel,
-	  thread_ts: main.ts,
-	  attachments
-	}
   
-	const contact = await Slack.chat.postMessage(envelope)
-  
-	envelope = {
-	  channel,
-	  thread_ts: main.ts,
-	  text,
-	}
-  
-	const first = await Slack.chat.postMessage(envelope)
-  
-	return res.json({
-	  main,
-	  contact,
-	  first,
+	const contact = await Slack.chat.postMessage({
+		channel,
+		thread_ts: main.ts,
+		attachments
 	})
+  
+	const first = await Slack.chat.postMessage({
+		channel,
+		thread_ts: main.ts,
+		text,
+	})
+  
+	return res.json({ ts: main.ts })
   
 })
 
