@@ -127,7 +127,13 @@ module.exports = (io, socket) => {
       
     })
 
-    socket.on('listMessages', async data => {
+    socket.on('listReplies', async data => {
+
+        const replies = await Slack.conversations.replies({
+            ts: data.ts,
+        })
+
+        socket.emit('receiveReplies', replies)
 
     })
   
