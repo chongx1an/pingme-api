@@ -6,7 +6,11 @@ module.exports = async (req, res, next) => {
     // let ip = RequestIp.getClientIp(req)
     // let ip = '60.52.31.157'
 
-    if(!req.body.ip) {
+    if(req.body.ip) {
+
+        req.ip = req.body.ip
+
+    } else {
 
         req.ip = (req.headers['x-forwarded-for'] || '').split(',').pop().trim() || 
         req.connection.remoteAddress || 
