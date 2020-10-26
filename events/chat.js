@@ -130,7 +130,6 @@ module.exports = (io, socket) => {
     socket.on('listReplies', async data => {
 
         const replies = await Slack.conversations.replies({
-            channel: '#cx',
             thread_ts: data.ts,
         }).catch(e => console.log(e))
 
