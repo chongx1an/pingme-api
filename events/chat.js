@@ -22,17 +22,17 @@ module.exports = (io, socket) => {
     
         const channel = "#cx"
 
-        if(socket.ts) {
+        if(data.ts) {
 
             envelope = {
                 channel,
-                thread_ts: socket.ts,
+                thread_ts: data.ts,
                 text,
             }
 
             await Slack.chat.postMessage(envelope)
 
-            return
+            return true
 
         }
     
@@ -120,6 +120,10 @@ module.exports = (io, socket) => {
         }
     
         const first = await Slack.chat.postMessage(envelope)
+
+        socket.emit('receiveTs', main.ts)
+
+        return true
       
     })
 
