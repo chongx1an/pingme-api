@@ -99,17 +99,14 @@ router.post('/', async (req, res) => {
   
 })
 
-router.post('/subsequent', async (req, res) => {
+router.get('/replies', async (req, res) => {
 
-	const envelope = {
-		channel: '#cx',
-		thread_ts: req.body.ts,
-		text: req.body.text,
-	}
+	const response = await Slack.conversations.replies({
+		channel: 'C019V3EM0H3',
+		ts: req.body.ts,
+	}).catch(e => console.log(e))
 
-	const message = await Slack.chat.postMessage(envelope)
-
-	return res.json({ message })
+	return res.json({ messages: response.messages })
 
 })
 
