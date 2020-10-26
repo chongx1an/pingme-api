@@ -103,7 +103,7 @@ router.get('/replies', async (req, res) => {
 
 	const response = await Slack.conversations.replies({
 		channel: 'C019V3EM0H3',
-		ts: req.body.ts,
+		ts: req.query.ts,
 	}).catch(e => console.log(e))
 
 	return res.json({ messages: response.messages })
