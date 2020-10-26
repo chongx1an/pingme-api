@@ -127,14 +127,88 @@ module.exports = (io, socket) => {
       
     })
 
-    socket.on('receiveMessage', async data => {
+    socket.on('listMessages', async data => {
 
     })
   
-    socket.on('formSubmitted', async data => {
+    socket.on('submitForm', async data => {
+
+        const { name, email } = data
+
+        const ip = socket.handshake.headers['x-forwarded-for']
+
+        const geo = GeoIp.lookup(ip) || { city: '', country: '' }
+    
+        const channel = "C019V3EM0H3"
+    
+        let envelope = {
+            text:  `${name} - ${geo.city}, ${geo.country}`,
+            channel,
+            ts: data.ts,
+        }
+    
+        await Slack.chat.update(envelope)
+
+        // const attachments = [
+        //     {
+        //         color: "#35373B",
+        //         blocks: [
+        //             {
+        //                 type: "section",
+        //                 fields: [
+        //                     {
+        //                         type: "mrkdwn",
+        //                         text: `*Name:*\n ${name}`
+        //                     },
+        //                     {
+        //                         type: "mrkdwn",
+        //                         text: `*Email:*\n ${email}`
+        //                     }
+        //                 ]
+        //             }
+        //         ]
+        //     },
+        //     {
+        //         color: "#3AA3E3",
+        //         blocks: [
+        //             {
+        //                 type: "actions",
+        //                 elements: [
+        //                     {
+        //                         type: "button",
+        //                         text: {
+        //                             type: "plain_text",
+        //                             text: "Mute",
+        //                             emoji: true
+        //                         },
+        //                         value: "message_id",
+        //                         action_id: "mute"
+        //                     },
+        //                     {
+        //                         type: "button",
+        //                         text: {
+        //                             type: "plain_text",
+        //                             text: "Ban IP",
+        //                             emoji: true
+        //                         },
+        //                         style: "danger",
+        //                         value: "message_id",
+        //                         action_id: "ban-ip"
+        //                     }
+        //                 ]
+        //             }
+        //         ]
+        //     }
+        // ]
+        
+        // envelope = {
+        //     channel,
+        //     ts: "1603545321.013000",
+        //     attachments
+        // }
+    
+        // await Slack.chat.update(envelope)
   
-
-
     })
 
 }
