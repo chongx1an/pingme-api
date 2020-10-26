@@ -134,7 +134,7 @@ module.exports = (io, socket) => {
             ts: data.ts,
         }).catch(e => console.log(e))
 
-        socket.emit('receiveReplies', { messages: res.messages })
+        socket.emit('receiveReplies', { messages: res.messages.slice(2, res.messages.length) })
 
     })
   
