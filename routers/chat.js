@@ -124,7 +124,7 @@ router.post('/contact', async (req, res) => {
 	let envelope = {
 	  text:  `${name} - ${city}, ${country}`,
 	  channel,
-	  ts: "1603545320.012900"
+	  ts: req.body.ts,
 	}
   
 	await Slack.chat.update(envelope)
@@ -189,7 +189,7 @@ router.post('/contact', async (req, res) => {
   
 	await Slack.chat.update(envelope)
   
-	return res.send("OK")
+	return res.json({ success: true })
   
 })
 
