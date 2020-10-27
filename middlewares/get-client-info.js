@@ -18,6 +18,8 @@ module.exports = async (req, res, next) => {
     //     (req.connection.socket ? req.connection.socket.remoteAddress : '127.0.0.1')
 
     // }
+
+    console.log(req.ip)
     
     req.geo = GeoIp.lookup(req.ip) || { city: '', country: '' }
 
