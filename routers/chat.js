@@ -185,8 +185,14 @@ router.post('/contact', async (req, res) => {
 	}
   
 	await Slack.chat.update(envelope)
+
+	const thanksMessage = await Slack.chat.postMessage({
+		channel,
+		text: 'Thanks for contact',
+		thread_ts: req.body.ts,
+	})
   
-	return res.json({ success: true })
+	return res.json({ thanksMessage })
   
 })
 
