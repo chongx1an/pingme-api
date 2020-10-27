@@ -8,15 +8,15 @@ router.post('/', async (req, res) => {
   
 	const channel = "#cx"
 
-	if(req.body.ts) {
+	if(req.body.threadTs) {
 
-		await Slack.chat.postMessage({
+		const message = await Slack.chat.postMessage({
 			channel,
 			text,
-			thread_ts: req.body.ts,
+			thread_ts: req.body.threadTs,
 		})
 
-		return res.json({ ts: req.body.ts })
+		return res.json({ thread_ts: req.body.threadTs, ts: message.ts })
 
 	}
 
@@ -95,7 +95,7 @@ router.post('/', async (req, res) => {
 		text,
 	})
   
-	return res.json({ ts: main.ts })
+	return res.json({ threadTs: main.ts })
   
 })
 
