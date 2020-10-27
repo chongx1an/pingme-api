@@ -103,7 +103,7 @@ router.get('/replies', async (req, res) => {
 
 	const response = await Slack.conversations.replies({
 		channel: 'C019V3EM0H3',
-		ts: req.query.ts,
+		ts: req.query.threadTs,
 	}).catch(e => console.log(e))
 
 	return res.json({ messages: response.messages })
@@ -121,7 +121,7 @@ router.post('/contact', async (req, res) => {
 	let envelope = {
 	  text:  `${name} - ${city}, ${country}`,
 	  channel,
-	  ts: req.body.ts,
+	  ts: req.body.threadTs,
 	}
   
 	await Slack.chat.update(envelope)
