@@ -197,19 +197,15 @@ router.post('/contact', async (req, res) => {
 })
 
 router.post('/event', async (req, res) => {
-
-	const channel = "#general"
   
-	// const envelope = {
-	//   text:  JSON.stringify(req.body),
-	//   channel
-	// }
-  
-	// await Slack.chat.postMessage(envelope)
+	await Slack.chat.postMessage({
+		text:  JSON.stringify(req.body),
+	 	channel: '#general'
+	})
 
-	// if(req.body.event.type == 'message') {
-	// 	req.io.emit(`${req.body.thread_ts}.receiveMessage`, req.body.event)
-	// }
+	if(req.body.event.type == 'message') {
+		req.io.emit(`${req.body.thread_ts}.receiveMessage`, req.body.event)
+	}
   
 	return res.send(req.body.challenge)
   
