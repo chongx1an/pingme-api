@@ -207,7 +207,7 @@ router.post('/event', async (req, res) => {
 
 	console.log(event)
 
-	if(event.event.type == 'message') {
+	if(event.type == 'message') {
 		console.log(`Emitting ${event.thread_ts}.receiveMessage event`)
 		global.io.emit(`${event.thread_ts}.receiveMessage`, event)
 	}
