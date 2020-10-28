@@ -203,11 +203,13 @@ router.post('/event', async (req, res) => {
 	//  	channel: '#general'
 	// })
 
-	console.log(req.body.event)
+	const event = req.body.event
 
-	if(req.body.event.type == 'message') {
-		console.log(`Emitting ${req.body.thread_ts}.receiveMessage event`)
-		global.io.emit(`${req.body.thread_ts}.receiveMessage`, req.body.event)
+	console.log(event)
+
+	if(event.event.type == 'message') {
+		console.log(`Emitting ${event.thread_ts}.receiveMessage event`)
+		global.io.emit(`${event.thread_ts}.receiveMessage`, event)
 	}
   
 	return res.send(req.body.challenge)
