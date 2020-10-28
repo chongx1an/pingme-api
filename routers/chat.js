@@ -200,12 +200,16 @@ router.post('/event', async (req, res) => {
 
 	const channel = "#general"
   
-	const envelope = {
-	  text:  JSON.stringify(req.body),
-	  channel
-	}
+	// const envelope = {
+	//   text:  JSON.stringify(req.body),
+	//   channel
+	// }
   
-	await Slack.chat.postMessage(envelope)
+	// await Slack.chat.postMessage(envelope)
+
+	// if(req.body.event.type == 'message') {
+	// 	req.io.emit(`${req.body.thread_ts}.receiveMessage`, req.body.event)
+	// }
   
 	return res.send(req.body.challenge)
   
