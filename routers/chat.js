@@ -203,7 +203,10 @@ router.post('/event', async (req, res) => {
 	//  	channel: '#general'
 	// })
 
+	console.log(req.body.event)
+
 	if(req.body.event.type == 'message') {
+		console.log(`Emitting ${req.body.thread_ts}.receiveMessage event`)
 		global.io.emit(`${req.body.thread_ts}.receiveMessage`, req.body.event)
 	}
   
