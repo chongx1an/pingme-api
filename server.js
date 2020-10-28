@@ -16,7 +16,7 @@ app.use(cors())
 
 app.use('/', router)
 
-const server = require('http').createServer(app)
+const server = require('https').createServer(app)
 const io = require('socket.io')(server)
 
 io.on('connection', () => console.log('Socket connected'))
