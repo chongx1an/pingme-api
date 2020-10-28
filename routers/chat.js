@@ -198,10 +198,10 @@ router.post('/contact', async (req, res) => {
 
 router.post('/event', async (req, res) => {
   
-	await Slack.chat.postMessage({
-		text:  JSON.stringify(req.body),
-	 	channel: '#general'
-	})
+	// await Slack.chat.postMessage({
+	// 	text:  JSON.stringify(req.body),
+	//  	channel: '#general'
+	// })
 
 	if(req.body.event.type == 'message') {
 		req.io.emit(`${req.body.thread_ts}.receiveMessage`, req.body.event)
