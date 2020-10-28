@@ -16,7 +16,7 @@ app.use(cors())
 
 app.use('/', router)
 
-const server = require('https').createServer(app)
+const server = require('http').createServer(app)
 const io = require('socket.io').listen(server)
 
 io.on('connection', () => console.log('Socket connected'))
@@ -28,4 +28,4 @@ app.use('/', (req, _, next) => {
 
 const port = process.env.PORT || 3000
 
-app.listen(port, () => console.log('Server is listening on port ' + port))
+server.listen(port, () => console.log('Server is listening on port ' + port))
