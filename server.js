@@ -16,6 +16,16 @@ app.use(cors())
 
 app.use('/', router)
 
+const server = require('http').createServer(app)
+const io = require('socket.io')(server)
+
+io.on('connection', () => console.log('Socket connected'))
+
+app.use('/', (req, _, next) => {
+  req.io = io
+  next()
+})
+
 const port = process.env.PORT || 3000
 
 app.listen(port, () => console.log('Server is listening on port ' + port))
