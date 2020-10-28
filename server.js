@@ -17,14 +17,9 @@ app.use(cors())
 app.use('/', router)
 
 const server = require('http').createServer(app)
-const io = require('socket.io').listen(server)
+global.io = require('socket.io').listen(server)
 
-io.on('connection', () => console.log('Socket connected'))
-
-app.use('/', (req, _, next) => {
-  req.io = io
-  next()
-})
+global.io.on('connection', () => console.log('Socket connected'))
 
 const port = process.env.PORT || 3000
 

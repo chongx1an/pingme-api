@@ -204,7 +204,7 @@ router.post('/event', async (req, res) => {
 	// })
 
 	if(req.body.event.type == 'message') {
-		req.io.emit(`${req.body.thread_ts}.receiveMessage`, req.body.event)
+		global.io.emit(`${req.body.thread_ts}.receiveMessage`, req.body.event)
 	}
   
 	return res.send(req.body.challenge)
