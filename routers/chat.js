@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
 			thread_ts: req.body.threadTs,
 		})
 
-		return res.json({ thread_ts: req.body.threadTs, ts: message.ts })
+		return res.json({ threadTs: req.body.threadTs, ts: message.ts })
 
 	}
 
