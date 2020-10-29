@@ -153,14 +153,27 @@ router.post('/contact', async (req, res) => {
 					fields: [
 						{
 							type: "mrkdwn",
-							text: `*Name:*\n ${name}`
+							text: `*Name:* ${name}`
 						},
 						{
 							type: "mrkdwn",
-							text: `*Email:*\n ${email}`
+							text: `*Email:* ${email}`
 						}
 					]
-				}
+				},
+				{
+					type: "section",
+					fields: [
+						{
+							type: "mrkdwn",
+							text: `*OS:* ${req.useragent.os}`
+						},
+						{
+							type: "mrkdwn",
+							text: `*Browser:* ${req.useragent.browser}`
+						},
+					]
+				},
 			]
 		},
 		{
