@@ -30,8 +30,6 @@ router.post('/', async (req, res) => {
 	
 	const name = 'N/A'
 	const email = 'N/A'
-
-	console.log(req.useragent)
   
 	const attachments = [
 		{
@@ -47,7 +45,7 @@ router.post('/', async (req, res) => {
 						{
 							type: "mrkdwn",
 							text: `*Email:* ${email}`
-						}
+						},
 					]
 				},
 				{
@@ -61,10 +59,6 @@ router.post('/', async (req, res) => {
 							type: "mrkdwn",
 							text: `*Browser:* ${req.useragent.browser}`
 						},
-						{
-							type: "mrkdwn",
-							text: `*GeoIP:* ${req.useragent.geoIp}`
-						}
 					]
 				},
 			]
