@@ -30,6 +30,8 @@ router.post('/', async (req, res) => {
 	
 	const name = 'N/A'
 	const email = 'N/A'
+
+	console.log(req.useragent)
   
 	const attachments = [
 		{
@@ -40,11 +42,11 @@ router.post('/', async (req, res) => {
 					fields: [
 						{
 							type: "mrkdwn",
-							text: `*Name:*\n ${name}`
+							text: `*Name:* ${name}`
 						},
 						{
 							type: "mrkdwn",
-							text: `*Email:*\n ${email}`
+							text: `*Email:* ${email}`
 						}
 					]
 				},
@@ -53,15 +55,15 @@ router.post('/', async (req, res) => {
 					fields: [
 						{
 							type: "mrkdwn",
-							text: `*OS:*\n ${req.useragent.os}`
+							text: `*OS:* ${req.useragent.os}`
 						},
 						{
 							type: "mrkdwn",
-							text: `*Browser:*\n ${req.useragent.browser}`
+							text: `*Browser:* ${req.useragent.browser}`
 						},
 						{
 							type: "mrkdwn",
-							text: `*GeoIP:*\n ${req.useragent.geoIp}`
+							text: `*GeoIP:* ${req.useragent.geoIp}`
 						}
 					]
 				},
