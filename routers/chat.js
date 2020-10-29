@@ -131,17 +131,15 @@ router.post('/contact', async (req, res) => {
   
 	const channel = "C019V3EM0H3"
   
-	let envelope = {
-	  text:  `${name} - ${city}, ${country}`,
-	  channel,
-	  ts: req.body.threadTs,
-	}
-  
-	await Slack.chat.update(envelope)
+	await Slack.chat.update({
+		text:  `${name} - ${city}, ${country}`,
+		channel,
+		ts: req.body.threadTs,
+	})
 
 	const response = await Slack.conversations.replies({
 		channel: 'C019V3EM0H3',
-		ts: req.query.threadTs,
+		ts: req.body.threadTs,
 	})
 
 	const infoMessage = response.messages[1]
