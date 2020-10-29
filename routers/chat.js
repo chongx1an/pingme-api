@@ -117,7 +117,7 @@ router.get('/replies', async (req, res) => {
 	const response = await Slack.conversations.replies({
 		channel: 'C019V3EM0H3',
 		ts: req.query.threadTs,
-	}).catch(e => console.log(e))
+	})
 
 	return res.json({ messages: response.messages })
 
@@ -138,6 +138,13 @@ router.post('/contact', async (req, res) => {
 	}
   
 	await Slack.chat.update(envelope)
+
+	const response = await Slack.conversations.replies({
+		channel: 'C019V3EM0H3',
+		ts: req.query.threadTs,
+	})
+
+	const infoMessage = response.messages[1]
 
 	const attachments = [
 		{
@@ -193,8 +200,8 @@ router.post('/contact', async (req, res) => {
   
 	await Slack.chat.update({
 		channel,
-		ts: "1603545321.013000",
-		attachments
+		ts: infoMessage.ts,
+		attachments,
 	})
 
 	// const thanksMessage = await Slack.chat.postMessage({
