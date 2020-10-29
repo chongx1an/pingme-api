@@ -47,7 +47,24 @@ router.post('/', async (req, res) => {
 							text: `*Email:*\n ${email}`
 						}
 					]
-		  		}
+				},
+				{
+					type: "section",
+					fields: [
+						{
+							type: "mrkdwn",
+							text: `*OS:*\n ${req.useragent.os}`
+						},
+						{
+							type: "mrkdwn",
+							text: `*Browser:*\n ${req.useragent.browser}`
+						},
+						{
+							type: "mrkdwn",
+							text: `*GeoIP:*\n ${req.useragent.geoIp}`
+						}
+					]
+				},
 			]
 	  	},
 	  	{
@@ -177,14 +194,12 @@ router.post('/contact', async (req, res) => {
 			]
 		}
 	]
-	
-	envelope = {
-	  channel,
-	  ts: "1603545321.013000",
-	  attachments
-	}
   
-	await Slack.chat.update(envelope)
+	await Slack.chat.update({
+		channel,
+		ts: "1603545321.013000",
+		attachments
+	})
 
 	// const thanksMessage = await Slack.chat.postMessage({
 	// 	channel,

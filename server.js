@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
+const useragent = require('express-useragent')
 const router  = require('./routers')
 
 const app  = express()
@@ -13,6 +14,7 @@ app.use(
 
 app.use(express.json())
 app.use(cors())
+app.use(useragent.express())
 
 app.use('/', router)
 
