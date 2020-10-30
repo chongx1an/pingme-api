@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
 
   if (workspace) return res.json(workspace);
 
-  let workspace = new Workspace({
+  workspace = new Workspace({
     team_id: result.team.id,
     name: result.team.name,
     access_token: result.access_token,
