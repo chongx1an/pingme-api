@@ -17,28 +17,29 @@ router.post('/', async (req, res) => {
     code: req.body.code
   });
 
-  const Slack = new WebClient(process.env.SLACK_TOKEN)
+  var workspace = Workspace.findOne({ team_id: result.team_id})
 
-  const message = await Slack.chat.postMessage({
-    channel: "#cx",
-    text: JSON.stringify(result)
+  if (workspace) return res.json(workspace);
+
+  let workspace = new Workspace({
+    team_id: result.team.id,
+    name: result.team.name,
+    access_token: result.access_token,
   })
 
-  // let workspace = new Workspace(req.body)
+  workspace.save()
+    .then(doc => {
 
-  // workspace.save()
-  //   .then(doc => {
+      if (!doc || doc.length === 0) return res.status(500).send(doc)
 
-  //     if (!doc || doc.length === 0) return res.status(500).send(doc)
+      res.status(201).send(doc)
 
-  //     res.status(201).send(doc)
+    })
+    .catch(err => {
 
-  //   })
-  //   .catch(err => {
+      res.status(500).json(err)
 
-  //     res.status(500).json(err)
-
-  //   })
+    })
 
 })
 

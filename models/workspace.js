@@ -2,11 +2,18 @@
 let mongoose = require('mongoose')
 
 let WorkspaceSchema = new mongoose.Schema({
-  name: String,
-  bot_access_token: {
+  team_id: {
     type: String,
     required: true,
     unique: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  access_token: {
+    type: String,
+    required: true
   }
 })
 
