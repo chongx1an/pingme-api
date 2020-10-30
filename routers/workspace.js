@@ -17,11 +17,6 @@ router.post('/', async (req, res) => {
     code: req.body.code
   });
 
-  await Slack.chat.postMessage({
-    channel: "#cx",
-    text: JSON.stringify(result),
-  })
-
   if (!result.team.id) return res.status(500).json(result)
 
   Workspace.findOne({ team_id: result.team.id}).then((workspace) => {
