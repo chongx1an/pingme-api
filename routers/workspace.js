@@ -19,6 +19,7 @@ router.post('/', async (req, res) => {
 
   var workspace = Workspace.findOne({ team_id: result.team_id})
 
+  console.log(workspace)
   if (workspace) return res.json(workspace);
 
   workspace = new Workspace({
