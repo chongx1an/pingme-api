@@ -2,7 +2,9 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const useragent = require('express-useragent')
+const mongoose = require('mongoose');
 const router  = require('./routers')
+
 
 const app  = express()
 
@@ -21,3 +23,15 @@ global.io.on('connection', () => console.log('Socket connected'))
 const port = process.env.PORT || 3000
 
 server.listen(port, () => console.log('Server is listening on port ' + port))
+
+const database_path = process.env.DB_PATH
+
+mongoose.set('useCreateIndex', true)
+mongoose.connect(database_path, {useNewUrlParser: true, useUnifiedTopology: true})
+
+var db = mongoose.connection;
+
+if(!db)
+  console.log("Error connecting db")
+else
+  console.log("Db connected successfully")
