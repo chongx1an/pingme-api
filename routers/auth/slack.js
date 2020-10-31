@@ -1,11 +1,11 @@
 const router = require('express').Router()
 const { WebClient } = require('@slack/web-api')
 const { slack: slackConfig } = require('../../config')
-const Team = require('../../models/team')
+const { Team, Shop } = require('../../models')
 
 router.post('/', async (req, res) => {
 
-    const params = req.requirePermit(['code'])
+    const params = req.requirePermit(['code'], ['shopId'])
 
     const result = await (new WebClient()).oauth.v2.access({
         client_id: slackConfig.clientId,
@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
         return res.error('team_already_exists')
     }
 
-    await Team.create({
+    const team = await Team.create({
         id: result.team.id,
         name: result.team.name,
         userId: result.authed_user.id,
@@ -31,6 +31,8 @@ router.post('/', async (req, res) => {
         incomingWebhookUrl: result.incoming_webhook.url
 
     }).catch(console.error)
+
+    await Shop.findByIdAndUpdate(params.shopId, { teamId: team._id })
 
     return res.success()
 
