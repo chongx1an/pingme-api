@@ -30,14 +30,12 @@ router.post('/', async (req, res) => {
         client_id: shopifyConfig.apiKey,
         client_secret: shopifyConfig.apiSecretKey,
         code: params.code,
-    }).catch(console.error)
-
-    console.log(response)
+    })
 
     const shop = await Shop.create({
         provider: 'shopify',
         hostname: params.shop,
-        accessToken: response.data.accessToken,
+        accessToken: response.data.access_token,
     })
 
     return res.json({ shop })
