@@ -24,4 +24,6 @@ global.io.on('connection', () => console.log('Socket connected'))
 
 const port = process.env.PORT || 3000
 
+console.asd()
+
 server.listen(port, () => console.log('Server is listening on port ' + port))

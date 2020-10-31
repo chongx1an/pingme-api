@@ -11,6 +11,7 @@ process.on('uncaughtException', function (err) {
 process.on('unhandledRejection', function(reason, p){
     Slack.chat.postMessage({
         channel: '#errors',
+
         text: JSON.stringify(reason)
     })
 })
