@@ -34,12 +34,12 @@ router.post('/', async (req, res) => {
 
       if (!doc || doc.length === 0) return res.status(500).send(doc)
 
-      res.status(201).send(doc)
+      return res.status(201).send(doc)
 
     })
     .catch(err => {
 
-      res.status(500).json(err)
+      return res.status(500).json(err)
 
     })
 
