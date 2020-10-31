@@ -6,7 +6,7 @@ const queryString = require('querystring')
 
 router.post('/', async (req, res) => {
 
-    let params = req.requirePermit(['code', 'hmac', 'shop', 'timestamp'], ['state'])
+    let params = req.requirePermit(['code', 'hmac', 'shop', 'state', 'timestamp'])
 
     const hmac = params.hmac
     delete params.hmac
@@ -14,18 +14,20 @@ router.post('/', async (req, res) => {
     let re = new RegExp(/[a-zA-Z0-9][a-zA-Z0-9\-]*\.myshopify\.com[\/]?/)
 
     if(!re.test(params.shop)) {
-        return res.status(401)
+        return res.error('Invalid shop name', 400)
     }
 
     const hmacDigest = crypto.createHmac('sha256', shopifyConfig.apiSecretKey)
     .update(queryString.stringify(params))
-    .digest('base64')
+    .digest('hex')
+
+    console.log([hmac, hmacDigest])
 
     if(hmac != hmacDigest) {
-        return res.status(401)
+        return res.error('Invalid hmac', 400)
     }
 
-    let { data } = await Axios.post(`https://${params.shop}/admin/oauth/access_token`, {
+    let response = await Axios.post(`https://${params.shop}/admin/oauth/access_token`, {
         client_id: shopifyConfig.apiKey,
         client_secret: shopifyConfig.apiSecretKey,
         code: params.code,
@@ -33,7 +35,7 @@ router.post('/', async (req, res) => {
 
     // store access token
 
-    return res.json(data)
+    return res.json(response.data)
 
 })
 
