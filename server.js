@@ -5,6 +5,7 @@ const useragent = require('express-useragent')
 const router  = require('./routers')
 
 const app  = express()
+require('./ext/app')(app)
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

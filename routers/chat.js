@@ -4,19 +4,19 @@ const Slack = new WebClient(process.env.SLACK_TOKEN)
 
 router.post('/', async (req, res) => {
 
-	let text = req.body.text
+	const params = req.requirePermit(['text'], ['threadTs'])
   
 	const channel = "#cx"
 
-	if(req.body.threadTs) {
+	if(params.threadTs) {
 
 		const message = await Slack.chat.postMessage({
 			channel,
-			text,
-			thread_ts: req.body.threadTs,
+			text: params.text,
+			thread_ts: params.threadTs,
 		})
 
-		return res.json({ threadTs: req.body.threadTs, ts: message.ts })
+		return res.json({ threadTs: params.threadTs, ts: message.ts })
 
 	}
 
@@ -105,7 +105,7 @@ router.post('/', async (req, res) => {
 	const first = await Slack.chat.postMessage({
 		channel,
 		thread_ts: main.ts,
-		text,
+		text: params.text,
 	})
   
 	return res.json({ threadTs: main.ts })
@@ -114,9 +114,11 @@ router.post('/', async (req, res) => {
 
 router.get('/replies', async (req, res) => {
 
+	const params = req.requirePermit(['threadTs'])
+
 	const response = await Slack.conversations.replies({
 		channel: 'C019V3EM0H3',
-		ts: req.query.threadTs,
+		ts: params.threadTs,
 	})
 
 	return res.json({ messages: response.messages })
@@ -125,7 +127,9 @@ router.get('/replies', async (req, res) => {
 
 router.post('/contact', async (req, res) => {
 
-	const { name, email } = req.body
+	const params = req.requirePermit(['threadTs'], ['name', 'email'])
+
+	const { name, email } = params
 
 	const { city, country } = req.geo
   
@@ -134,12 +138,12 @@ router.post('/contact', async (req, res) => {
 	await Slack.chat.update({
 		text:  `${name} - ${city}, ${country}`,
 		channel,
-		ts: req.body.threadTs,
+		ts: params.threadTs,
 	})
 
 	const response = await Slack.conversations.replies({
 		channel: 'C019V3EM0H3',
-		ts: req.body.threadTs,
+		ts: params.threadTs,
 	})
 
 	const infoMessage = response.messages[1]
@@ -218,7 +222,7 @@ router.post('/contact', async (req, res) => {
 	// const thanksMessage = await Slack.chat.postMessage({
 	// 	channel,
 	// 	text: 'Thanks for contact',
-	// 	thread_ts: req.body.ts,
+	// 	thread_ts: params.ts,
 	// })
   
 	return res.json({ success: true })

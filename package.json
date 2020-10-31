@@ -14,11 +14,13 @@
     "@slack/interactive-messages": "^1.7.0",
     "@slack/web-api": "^5.13.0",
     "@supercharge/request-ip": "^1.1.2",
+    "axios": "^0.21.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-useragent": "^1.0.15",
     "geoip-lite": "^1.4.2",
+    "mongoose": "^5.10.11",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
