@@ -22,8 +22,6 @@ router.post('/', async (req, res) => {
     .update(queryString.stringify(params))
     .digest('hex')
 
-    console.log([hmac, hmacDigest])
-
     if(hmac != hmacDigest) {
         return res.error('Invalid hmac', 400)
     }
@@ -33,6 +31,8 @@ router.post('/', async (req, res) => {
         client_secret: shopifyConfig.apiSecretKey,
         code: params.code,
     }).catch(console.error)
+
+    console.log(response)
 
     const shop = await Shop.create({
         provider: 'shopify',
