@@ -33,6 +33,8 @@ router.post('/', async (req, res) => {
 
     // store access token
 
+    return res.json(data)
+
 })
 
 module.exports = router
