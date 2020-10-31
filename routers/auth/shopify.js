@@ -6,11 +6,7 @@ const queryString = require('querystring')
 
 router.post('/', async (req, res) => {
 
-    let params = req.requirePermit(['code', 'hmac', 'shop', 'state', 'timestamp'])
-
-    if(params.nonce != shopifyConfig.nonce) {
-        return res.status(401)
-    }
+    let params = req.requirePermit(['code', 'hmac', 'shop', 'timestamp'])
 
     const hmac = params.hmac
     delete params.hmac
