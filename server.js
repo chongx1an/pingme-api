@@ -1,5 +1,6 @@
 require('dotenv').config()
 require('./ext')
+require('./utils/error-handler')
 const express = require('express')
 const cors = require('cors')
 const useragent = require('express-useragent')
