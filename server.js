@@ -4,7 +4,7 @@ const cors = require('cors')
 const useragent = require('express-useragent')
 const mongoose = require('mongoose');
 const router  = require('./routers')
-
+// require('./database')
 
 const app  = express()
 require('./ext/app')(app)
