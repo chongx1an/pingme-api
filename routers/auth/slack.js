@@ -22,7 +22,14 @@ router.post('/', async (req, res) => {
     await Team.create({
         id: result.team.id,
         name: result.team.name,
-        accessToken: result.access_token,
+        userId: result.authed_user.id,
+        mainChannelId: result.incoming_webhook.channel_id,
+        bot: {
+            userId: result.bot_user_id,
+            accessToken: result.access_token,
+        },
+        incomingWebhookUrl: result.incoming_webhook.url
+
     }).catch(console.error)
 
     return res.success()
