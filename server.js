@@ -1,4 +1,5 @@
 require('dotenv').config()
+require('./ext')
 const express = require('express')
 const cors = require('cors')
 const useragent = require('express-useragent')
