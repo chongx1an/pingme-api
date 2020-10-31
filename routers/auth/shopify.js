@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
         return res.status(401)
     }
 
-    let { data } = await Axios.post(`https://${shop}/admin/oauth/access_token`, {
+    let { data } = await Axios.post(`https://${params.shop}/admin/oauth/access_token`, {
         client_id: shopifyConfig.apiKey,
         client_secret: shopifyConfig.apiSecretKey,
         code: params.code,
