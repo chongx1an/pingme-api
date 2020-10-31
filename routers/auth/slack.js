@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const { WebClient } = require('@slack/web-api')
 const { slack: slackConfig } = require('../config')
+const Team = require('../../models/team')
 
 router.post('/', async (req, res) => {
 

@@ -8,7 +8,5 @@ module.exports = {
         clientId: process.env.SLACK_CLIENT_ID,
         clientSecret: process.env.SLACK_CLIENT_SECRET,
     },
-    mongo: {
-        url: process.env.MONGO_URL,
-    }
+    dbPath: process.env.DB_PATH,
 }
