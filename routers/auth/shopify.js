@@ -2,6 +2,7 @@ const router = require('express').Router()
 const crypto = require('crypto')
 const { shopify: shopifyConfig } = require('../../config')
 const { default: Axios } = require('axios')
+const queryString = require('querystring')
 
 router.get('/', async (req, res) => {
 
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
     }
 
     return res.json({
-        url: `https://{shop}.myshopify.com/admin/oauth/authorize?${params.toQuery()}`,
+        url: `https://{shop}.myshopify.com/admin/oauth/authorize?${queryString.stringify(params)}`,
     })
 
 })
@@ -36,7 +37,7 @@ router.get('/callback', async (req, res) => {
     }
 
     const hmacDigest = crypto.createHmac('sha256', shopifyConfig.apiSecretKey)
-    .update(params.toQuery())
+    .update(queryString.stringify(params))
     .digest('base64')
 
     if(hmac != hmacDigest) {
