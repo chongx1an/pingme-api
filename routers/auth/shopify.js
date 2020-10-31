@@ -6,7 +6,7 @@ const queryString = require('querystring')
 
 router.post('/', async (req, res) => {
 
-    let params = req.requirePermit(['code', 'hmac', 'shop', 'timestamp'])
+    let params = req.requirePermit(['code', 'hmac', 'shop', 'timestamp'], ['state'])
 
     const hmac = params.hmac
     delete params.hmac

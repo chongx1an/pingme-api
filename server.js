@@ -3,7 +3,6 @@ require('./ext')
 const express = require('express')
 const cors = require('cors')
 const useragent = require('express-useragent')
-const mongoose = require('mongoose');
 const router  = require('./routers')
 require('./database')
 
@@ -11,8 +10,8 @@ const app  = express()
 require('./ext/app')(app)
 
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
 app.use(cors())
+app.use(express.urlencoded({ extended: true }))
 app.use(useragent.express())
 
 app.use('/', router)
