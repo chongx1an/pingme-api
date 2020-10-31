@@ -4,24 +4,7 @@ const { shopify: shopifyConfig } = require('../../config')
 const { default: Axios } = require('axios')
 const queryString = require('querystring')
 
-router.get('/', async (req, res) => {
-
-    const params = req.requirePermit(['hmac', 'shop', 'timestamp'])
-
-    const query = {
-        client_id: shopifyConfig.apiKey,
-        scope: 'read_products,read_customers,read_orders',
-        redirect_uri: 'https://the-pingme-api.herokuapp.com/auth/shopify/callback',
-        state: shopifyConfig.nonce,
-    }
-
-    return res.json({
-        url: `https://${params.shop}/admin/oauth/authorize?${queryString.stringify(query)}`,
-    })
-
-})
-
-router.get('/callback', async (req, res) => {
+router.post('/', async (req, res) => {
 
     let params = req.requirePermit(['code', 'hmac', 'shop', 'state', 'timestamp'])
 
@@ -46,15 +29,13 @@ router.get('/callback', async (req, res) => {
         return res.status(401)
     }
 
-    let { data } = await Axios.post(`https://${shop}.myshopify.com/admin/oauth/access_token`, {
+    let { data } = await Axios.post(`https://${shop}/admin/oauth/access_token`, {
         client_id: shopifyConfig.apiKey,
         client_secret: shopifyConfig.apiSecretKey,
         code: params.code,
     }).catch(console.error)
 
     // store access token
-
-    return res.send('OK')
 
 })
 
