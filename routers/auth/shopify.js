@@ -4,7 +4,7 @@ const { shopify: shopifyConfig } = require('../../config')
 const { default: Axios } = require('axios')
 const queryString = require('querystring')
 
-router.post('/', async (req, res) => {
+router.get('/', async (req, res) => {
 
     let params = req.requirePermit(['code', 'hmac', 'shop', 'timestamp'], ['state'])
 

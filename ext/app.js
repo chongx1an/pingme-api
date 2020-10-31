@@ -17,7 +17,10 @@ module.exports = app => {
         })
 
         if(missingKeys.length) {
-            throw new Error('Parameter error: [' + missingKeys.map(key => `"${key}"`).join(', ') + '] is required')
+            return this.res.status(400).json({
+                error: 'Bad request',
+                message: 'Parameter error: [' + missingKeys.map(key => `"${key}"`).join(', ') + '] is required'
+            })
         }
 
         permits = requires.concat(permits)
