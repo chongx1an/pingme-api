@@ -6,7 +6,9 @@ const queryString = require('querystring')
 
 router.get('/', async (req, res) => {
 
-    const params = {
+    const params = req.requirePermit(['hmac', 'shop', 'timestamp'])
+
+    const query = {
         client_id: shopifyConfig.apiKey,
         scope: 'read_products,read_customers,read_orders',
         redirect_uri: 'https://the-pingme-api.herokuapp.com/auth/shopify/callback',
@@ -14,7 +16,7 @@ router.get('/', async (req, res) => {
     }
 
     return res.json({
-        url: `https://{shop}.myshopify.com/admin/oauth/authorize?${queryString.stringify(params)}`,
+        url: `https://${params.shop}/admin/oauth/authorize?${queryString.stringify(query)}`,
     })
 
 })
