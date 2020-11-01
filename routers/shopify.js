@@ -59,7 +59,12 @@ router.get('/auth', async (req, res) => {
         client_id: shopifyConfig.apiKey,
         client_secret: shopifyConfig.apiSecretKey,
         code: params.code,
-    })
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    }).catch(e => console.log(e.response.data))
 
     const store = await Store.create({
         provider: 'shopify',

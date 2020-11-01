@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const jwt = require('../utils/jwt')
 
 const schema = mongoose.Schema({
 
@@ -24,7 +25,6 @@ const schema = mongoose.Schema({
 }, { timestamps: true })
 
 schema.methods.tokenize = function() {
-    const jwt = require('../utils/jwt')
     return jwt.encode({
         aud: 'https://the-pingme-api.herokuapp.com/shopify',
         iss: 'https://the-pingme-api.herokuapp.com/shopify',
