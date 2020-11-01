@@ -6,6 +6,29 @@ const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
 const Store = require('../models/store')
 
+router.get('/install', async (req, res) => {
+
+    const params = req.requirePermit(['hostName'])
+
+    if(await Store.exists({ hostName: params.hostName })) {
+        return res.json({
+            redirectTo: `https://${params.hostName}/admin/apps/${shopifyConfig.apiKey}`
+        })
+    }
+
+    const queryParams = queryString.stringify({
+        client_id: shopifyConfig.apiKey,
+        scope: 'read_products,read_customers,read_orders,write_script_tags',
+        redirect_uri: 'https://minimo-admin.netlify.app/shopify/oauth',
+        state: shopifyConfig.nonce,
+    })
+
+    return res.json({
+        redirectTo: `https://${params.hostName}/admin/oauth/authorize?${queryParams}`
+    })
+
+})
+
 router.post('/auth', async (req, res) => {
 
     let params = req.requirePermit(['code', 'hmac', 'shop', 'state', 'timestamp'])
@@ -39,7 +62,9 @@ router.post('/auth', async (req, res) => {
         accessToken: response.data.access_token,
     })
 
-    return res.json({ store })
+    return res.json({
+        redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
+    })
 
 })
 
