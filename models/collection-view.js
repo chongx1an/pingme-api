@@ -10,10 +10,6 @@ const schema = mongoose.Schema({
         type: Number,
         required: true,
     },
-    count: {
-        type: Number,
-        default: 1,
-    },
     history: {
         type: [Date],
         default: [Date.now()],
