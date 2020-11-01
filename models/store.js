@@ -24,15 +24,6 @@ const schema = mongoose.Schema({
 
 }, { timestamps: true })
 
-schema.methods.tokenize = function() {
-    return jwt.encode({
-        aud: 'https://the-pingme-api.herokuapp.com/shopify',
-        iss: 'https://the-pingme-api.herokuapp.com/shopify',
-        sub: this._id,
-        at: Date.now(),
-    })
-}
-
 const Store = mongoose.model('Store', schema)
 
 module.exports = Store

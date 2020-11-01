@@ -4,8 +4,7 @@ const { shopify: shopifyConfig } = require('../config')
 const ApiClient = require('../services/api-client')
 const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
-const Store = require('../models/store')
-const { ProductView, CollectionView } = require('../models')
+const { Store, ProductView, CollectionView } = require('../models')
 
 router.get('/install', async (req, res) => {
 
@@ -67,6 +66,38 @@ router.get('/auth', async (req, res) => {
         accessToken: response.data.access_token,
     })
 
+    const shopifyApi = new Shopify({
+        shopName: store.hostName,
+        accessToken: store.accessToken
+    })
+
+    let response = await shopifyApi.theme.list()
+
+    // Patch theme
+    await Promise.all(response.themes.map(theme => {
+
+        return new Promise(async (resolve, reject) => {
+
+            try {
+                await shopifyApi.asset.update(theme.id, {
+                    key: 'templates/product.backup.liquid',
+                    source_key: 'templates/product.liquid',
+                })
+    
+                await shopifyApi.asset.update(theme.id, {
+                    key: 'templates/product.liquid',
+                    value: '',
+                })
+            } catch(e) {
+                reject(e)
+            }
+
+            resolve(true)
+
+        })
+
+    }))
+
     return res.json({
         redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
     })
@@ -79,18 +110,14 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
 
     const store = await Store.findOne({ hostName })
 
-    const shopify = new Shopify({
+    const shopifyApi = new Shopify({
         shopName: store.hostName,
         accessToken: store.accessToken
     })
 
-    let response = shopify.scriptTag.list({
-        src: 'https://minimo-chatbox.surge.sh/script.js',
-    })
+    let response = await shopifyApi.theme.list()
 
-    if(response.script_tags.length) {
-        await shopify.scriptTag.delete(response.script_tags[0].id)
-    }
+    // Patch theme
 
     return res.send('OK')
 
