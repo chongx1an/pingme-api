@@ -36,6 +36,8 @@ router.get('/install', async (req, res) => {
 
 router.get('/auth', async (req, res) => {
 
+    console.log('AUTH')
+
     let params = req.requirePermit(['code', 'hmac', 'shop', 'state', 'timestamp'])
 
     const hmac = params.hmac
@@ -59,13 +61,15 @@ router.get('/auth', async (req, res) => {
         client_id: shopifyConfig.apiKey,
         client_secret: shopifyConfig.apiSecretKey,
         code: params.code,
-    }).catch(e => console.log(e.response.data))
+    })
 
     const store = await Store.create({
         provider: 'shopify',
         hostName: params.shop,
         accessToken: response.data.access_token,
     })
+
+    console.log(4)
 
     return res.json({
         token: store.tokenize(),
