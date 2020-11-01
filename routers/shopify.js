@@ -54,12 +54,12 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
         accessToken: store.accessToken
     })
 
-    let res = shopify.scriptTag.list({
+    let response = shopify.scriptTag.list({
         src: 'https://minimo-chatbox.surge.sh/script.js',
     })
 
-    if(res.script_tags.length) {
-        await shopify.scriptTag.delete(res.script_tags[0].id)
+    if(response.script_tags.length) {
+        await shopify.scriptTag.delete(response.script_tags[0].id)
     }
 
     return res.send('OK')
