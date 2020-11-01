@@ -44,6 +44,7 @@ router.get('/auth', async (req, res) => {
         return res.error('invalid_shop_name', 400)
     }
 
+    // Verify hmac
     const hmac = params.hmac
     delete params.hmac
 
@@ -55,12 +56,14 @@ router.get('/auth', async (req, res) => {
         return res.error('invalid_hmac', 400)
     }
 
+    // Get access token
     let response = await ApiClient.post(`https://${params.shop}/admin/oauth/access_token`, {
         client_id: shopifyConfig.apiKey,
         client_secret: shopifyConfig.apiSecretKey,
         code: params.code,
     })
 
+    // Create store in DB
     const store = await Store.create({
         provider: 'shopify',
         hostName: params.shop,
@@ -72,11 +75,13 @@ router.get('/auth', async (req, res) => {
         accessToken: store.accessToken
     })
 
+    // Create script tag
     await shopifyApi.scriptTag.create({
         event: 'onload',
         src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@b26be84/script.js',
     })
 
+    // Create uninstall app webhook
     await shopifyApi.webhook.create({
         topic: 'app/uninstalled',
         address: 'https://the-pingme-api.herokuapp.com/shopify/webhooks/app/uninstalled',
@@ -143,6 +148,7 @@ router.get('/view/collections/:collectionId', async (req, res) => {
 
 router.post('/webhooks/app/uninstalled', async(req, res) => {
 
+    // Verify hmac
     const hmac = req.get('X-Shopify-Hmac-Sha256')
 
     const body = getRawBody(req)
@@ -164,6 +170,7 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
         accessToken: store.accessToken
     })
 
+    // Find and delete script tag
     let response = await shopifyApi.scriptTag.list({
         src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@b26be84/script.js',
     })
@@ -172,6 +179,7 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
         await shopifyApi.scriptTag.delete(response.script_tags[0].id)
     }
 
+    // Soft delete store
     await store.update({ deleted: true })
     
     return res.send('OK')
