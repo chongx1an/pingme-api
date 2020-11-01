@@ -4,7 +4,7 @@ const Shopify = require('shopify-api-node')
 const { slack: slackConfig } = require('../config')
 const { Team, Store } = require('../models')
 
-router.get('/connect', async (req, res) => {
+router.get('/connect', async (_, res) => {
 
     const scope = ['incoming-webhook', 'commands', 'chat:write'].join(",")
     const clientId = slackConfig.clientId

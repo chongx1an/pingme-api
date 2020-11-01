@@ -13,7 +13,8 @@ const schema = mongoose.Schema({
     },
     hostName: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
     },
     accessToken: {
         type: String,
@@ -21,6 +22,16 @@ const schema = mongoose.Schema({
     },
 
 }, { timestamps: true })
+
+schema.methods.tokenize = function() {
+    const jwt = require('../utils/jwt')
+    return jwt.encode({
+        aud: 'https://the-pingme-api.herokuapp.com/shopify',
+        iss: 'https://the-pingme-api.herokuapp.com/shopify',
+        sub: this._id,
+        at: Date.now(),
+    })
+}
 
 const Store = mongoose.model('Store', schema)
 

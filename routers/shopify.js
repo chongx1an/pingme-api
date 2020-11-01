@@ -10,15 +10,20 @@ router.get('/install', async (req, res) => {
 
     const params = req.requirePermit(['hostName'])
 
-    if(await Store.exists({ hostName: params.hostName })) {
+    const store = await Store.findOne({ hostName: params.hostName })
+
+    if(store) {
         return res.json({
+            token: store.tokenize(),
             redirectTo: `https://${params.hostName}/admin/apps/${shopifyConfig.apiKey}`
         })
     }
 
+    const scope = ['read_products', 'read_customers', 'read_orders', 'write_script_tags'].join(',')
+
     const queryParams = queryString.stringify({
         client_id: shopifyConfig.apiKey,
-        scope: 'read_products,read_customers,read_orders,write_script_tags',
+        scope,
         redirect_uri: 'https://minimo-admin.netlify.app/shopify/oauth',
         state: shopifyConfig.nonce,
     })
@@ -63,6 +68,7 @@ router.get('/auth', async (req, res) => {
     })
 
     return res.json({
+        token: store.tokenize(),
         redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
     })
 
@@ -90,5 +96,7 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
     return res.send('OK')
 
 })
+
+const jwt = require('../utils/jwt')
 
 module.exports = router
