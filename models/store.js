@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const jwt = require('../utils/jwt')
 
 const schema = mongoose.Schema({
 
