@@ -71,32 +71,10 @@ router.get('/auth', async (req, res) => {
         accessToken: store.accessToken
     })
 
-    let response = await shopifyApi.theme.list()
-
-    // Patch theme
-    await Promise.all(response.themes.map(theme => {
-
-        return new Promise(async (resolve, reject) => {
-
-            try {
-                await shopifyApi.asset.update(theme.id, {
-                    key: 'templates/product.backup.liquid',
-                    source_key: 'templates/product.liquid',
-                })
-    
-                await shopifyApi.asset.update(theme.id, {
-                    key: 'templates/product.liquid',
-                    value: '',
-                })
-            } catch(e) {
-                reject(e)
-            }
-
-            resolve(true)
-
-        })
-
-    }))
+    await shopifyApi.scriptTag.create({
+        event: 'onload',
+        src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@b26be84/script.js',
+    })
 
     return res.json({
         redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
@@ -115,10 +93,14 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
         accessToken: store.accessToken
     })
 
-    let response = await shopifyApi.theme.list()
+    let response = await shopifyApi.scriptTag.list({
+        src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@b26be84/script.js',
+    })
 
-    // Patch theme
-
+    if(response.script_tags.length) {
+        await shopifyApi.scriptTag.delete(response.script_tags[0].id)
+    }
+    
     return res.send('OK')
 
 })
