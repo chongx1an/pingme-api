@@ -8,7 +8,7 @@ if(customerId) {
       
       fetch(`/products/${handle}.json`)
       .then(res => res.json())
-      .then(res => fetch(`https://the-pingme-api.herokuapp.com/shopify/view/products/${res.product.id}?customerId=${customerId}`))
+      .then(res => fetch(`https://the-pingme-api.herokuapp.com/shopify/view/products/${res.product.id}?hostName=${Shopify.shop}&customerId=${customerId}`))
         
     } else if(location.pathname.includes('/collections/')) {
       
@@ -17,7 +17,7 @@ if(customerId) {
 
       fetch(`/collections/${handle}.json`)
       .then(res => res.json())
-      .then(res => fetch(`https://the-pingme-api.herokuapp.com/shopify/view/collections/${res.collection.id}?customerId=${customerId}`))
+      .then(res => fetch(`https://the-pingme-api.herokuapp.com/shopify/view/collections/${res.collection.id}?hostName=${Shopify.shop}&customerId=${customerId}`))
 
     }
 

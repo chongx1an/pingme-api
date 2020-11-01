@@ -96,7 +96,9 @@ router.get('/auth', async (req, res) => {
 
 router.get('/view/products/:productId', async (req, res) => {
 
-    const { productId, customerId } = req.requirePermit(['productId', 'customerId'])
+    const { hostName, productId, customerId } = req.requirePermit(['hostName', 'productId', 'customerId'])
+
+    const store = await Store.findOne({ hostName })
 
     const view = await ProductView.findOne({
         productId,
@@ -110,6 +112,7 @@ router.get('/view/products/:productId', async (req, res) => {
     } else {
 
         await ProductView.create({
+            storeId: store._id,
             productId,
             customerId,
         })
@@ -122,7 +125,9 @@ router.get('/view/products/:productId', async (req, res) => {
 
 router.get('/view/collections/:collectionId', async (req, res) => {
 
-    const { collectionId, customerId } = req.requirePermit(['collectionId', 'customerId'])
+    const { hostName, collectionId, customerId } = req.requirePermit(['hostName', 'collectionId', 'customerId'])
+
+    const store = await Store.findOne({ hostName })
 
     const view = await CollectionView.findOne({
         collectionId,
@@ -136,6 +141,7 @@ router.get('/view/collections/:collectionId', async (req, res) => {
     } else {
 
         await CollectionView.create({
+            storeId: store._id,
             collectionId,
             customerId,
         })
