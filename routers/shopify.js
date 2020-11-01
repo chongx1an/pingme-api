@@ -15,7 +15,6 @@ router.get('/install', async (req, res) => {
 
     if(store) {
         return res.json({
-            token: store.tokenize(),
             redirectTo: `https://${params.hostName}/admin/apps/${shopifyConfig.apiKey}`
         })
     }
@@ -36,8 +35,6 @@ router.get('/install', async (req, res) => {
 })
 
 router.get('/auth', async (req, res) => {
-
-    console.log('AUTH')
 
     let params = req.requirePermit(['code', 'hmac', 'shop', 'state', 'timestamp'])
 
@@ -70,10 +67,7 @@ router.get('/auth', async (req, res) => {
         accessToken: response.data.access_token,
     })
 
-    console.log(4)
-
     return res.json({
-        token: store.tokenize(),
         redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
     })
 

@@ -6,7 +6,7 @@ const schema = mongoose.Schema({
         type: Number,
         required: true,
     },
-    productId: {
+    collectionId: {
         type: Number,
         required: true,
     },
