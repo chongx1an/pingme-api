@@ -5,6 +5,7 @@ const ApiClient = require('../services/api-client')
 const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
 const Store = require('../models/store')
+const View = require('../models/view')
 
 router.get('/install', async (req, res) => {
 
@@ -101,6 +102,18 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
 
 })
 
-const jwt = require('../utils/jwt')
+router.get('/track', async (req, res) => {
+
+    const params = req.requirePermit(['kind', 'itemId', 'customerId'])
+
+    const view = await View.create({
+        kind: params.kind,
+        itemId: params.itemId,
+        customerId: params.customerId,
+    })
+
+    return res.json({ view })
+
+})
 
 module.exports = router
