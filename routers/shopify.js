@@ -76,6 +76,12 @@ router.get('/auth', async (req, res) => {
         src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@b26be84/script.js',
     })
 
+    await shopifyApi.webhook.create({
+        topic: 'app/uninstalled',
+        address: 'https://the-pingme-api.herokuapp.com/shopify/webhooks/app/uninstalled',
+        format: 'json',
+    })
+
     return res.json({
         redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
     })
