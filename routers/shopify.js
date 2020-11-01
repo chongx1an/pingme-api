@@ -5,7 +5,7 @@ const ApiClient = require('../services/api-client')
 const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
 const Store = require('../models/store')
-const View = require('../models/view')
+const { ProductView, CollectionView } = require('../models')
 
 router.get('/install', async (req, res) => {
 
@@ -102,17 +102,61 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
 
 })
 
-router.get('/track', async (req, res) => {
+router.get('/view/products/:productId', async (req, res) => {
 
-    const params = req.requirePermit(['kind', 'itemId', 'customerId'])
+    const params = req.requirePermit(['productId', 'customerId'])
 
-    const view = await View.create({
-        kind: params.kind,
-        itemId: params.itemId,
+    const view = await ProductView.findOne({
+        productId: params.productId,
         customerId: params.customerId,
     })
 
-    return res.json({ view })
+    if(view) {
+
+        await view.update({
+            count: view.count + 1,
+            $push: { history: Date.now() },
+        })
+
+    } else {
+
+        await ProductView.create({
+            productId: params.productId,
+            customerId: params.customerId,
+        })
+
+    }
+
+    return res.send('OK')
+
+})
+
+router.get('/view/collections/:collectionId', async (req, res) => {
+
+    const params = req.requirePermit(['collectionId', 'customerId'])
+
+    const view = await CollectionView.findOne({
+        collectionId: params.collectionId,
+        customerId: params.customerId,
+    })
+
+    if(view) {
+
+        await view.update({
+            count: view.count + 1,
+            $push: { history: Date.now() },
+        })
+
+    } else {
+
+        await CollectionView.create({
+            collectionId: params.collectionId,
+            customerId: params.customerId,
+        })
+
+    }
+
+    return res.send('OK')
 
 })
 
