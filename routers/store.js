@@ -1,20 +1,20 @@
 const router = require('express').Router()
-const Shop = require('../models/shop')
+const Store = require('../models/store')
 const { Types } = require('mongoose')
 
 router.get('/:identifier', async (req, res) => {
 
     const isId = Types.ObjectId.isValid(req.params.identifier)
 
-    let shop
+    let store
 
     if(isId) {
-        shop = await Shop.findById(req.params.identifier)
+        store = await Store.findById(req.params.identifier)
     } else {
-        shop = await Shop.findOne({ hostname: req.params.identifier })
+        store = await Store.findOne({ hostname: req.params.identifier })
     }
 
-    return res.json({ shop })
+    return res.json({ store })
 
 })
 

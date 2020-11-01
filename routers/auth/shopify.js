@@ -3,7 +3,7 @@ const crypto = require('crypto')
 const { shopify: shopifyConfig } = require('../../config')
 const { default: Axios } = require('axios')
 const queryString = require('querystring')
-const Shop = require('../../models/shop')
+const Store = require('../../models/store')
 
 router.post('/', async (req, res) => {
 
@@ -32,13 +32,13 @@ router.post('/', async (req, res) => {
         code: params.code,
     })
 
-    const shop = await Shop.create({
+    const store = await Store.create({
         provider: 'shopify',
         hostname: params.shop,
         accessToken: response.data.access_token,
     })
 
-    return res.json({ shop })
+    return res.json({ store })
 
 })
 
