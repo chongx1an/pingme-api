@@ -5,6 +5,7 @@ const ApiClient = require('../services/api-client')
 const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
 const { Store, ProductView, CollectionView } = require('../models')
+const getRawBody = require('raw-body')
 
 router.get('/install', async (req, res) => {
 
@@ -37,21 +38,21 @@ router.get('/auth', async (req, res) => {
 
     let params = req.requirePermit(['code', 'hmac', 'shop', 'state', 'timestamp'])
 
-    const hmac = params.hmac
-    delete params.hmac
-
     let re = new RegExp(/[a-zA-Z0-9][a-zA-Z0-9\-]*\.myshopify\.com[\/]?/)
 
     if(!re.test(params.shop)) {
-        return res.error('Invalid shop name', 400)
+        return res.error('invalid_shop_name', 400)
     }
+
+    const hmac = params.hmac
+    delete params.hmac
 
     const hmacDigest = crypto.createHmac('sha256', shopifyConfig.apiSecretKey)
     .update(queryString.stringify(params))
     .digest('hex')
 
     if(hmac != hmacDigest) {
-        return res.error('Invalid hmac', 400)
+        return res.error('invalid_hmac', 400)
     }
 
     let response = await ApiClient.post(`https://${params.shop}/admin/oauth/access_token`, {
@@ -85,29 +86,6 @@ router.get('/auth', async (req, res) => {
     return res.json({
         redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
     })
-
-})
-
-router.post('/webhooks/app/uninstalled', async(req, res) => {
-
-    const hostName = req.headers['x-shopify-shop-domain']
-
-    const store = await Store.findOne({ hostName })
-
-    const shopifyApi = new Shopify({
-        shopName: store.hostName,
-        accessToken: store.accessToken
-    })
-
-    let response = await shopifyApi.scriptTag.list({
-        src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@b26be84/script.js',
-    })
-
-    if(response.script_tags.length) {
-        await shopifyApi.scriptTag.delete(response.script_tags[0].id)
-    }
-    
-    return res.send('OK')
 
 })
 
@@ -159,6 +137,43 @@ router.get('/view/collections/:collectionId', async (req, res) => {
 
     }
 
+    return res.send('OK')
+
+})
+
+router.post('/webhooks/app/uninstalled', async(req, res) => {
+
+    const hmac = req.get('X-Shopify-Hmac-Sha256')
+
+    const body = getRawBody(req)
+
+    const hashDigest = crypto.createHmac('sha256', shopifyConfig.apiSecretKey)
+    .update(body, 'utf8', 'hex')
+    .digest('base64')
+
+    if(hmac != hashDigest) {
+        return res.error('invalid_hmac', 401)
+    }
+
+    const hostName = req.headers['x-shopify-shop-domain']
+
+    const store = await Store.findOne({ hostName })
+
+    const shopifyApi = new Shopify({
+        shopName: store.hostName,
+        accessToken: store.accessToken
+    })
+
+    let response = await shopifyApi.scriptTag.list({
+        src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@b26be84/script.js',
+    })
+
+    if(response.script_tags.length) {
+        await shopifyApi.scriptTag.delete(response.script_tags[0].id)
+    }
+
+    await store.update({ deleted: true })
+    
     return res.send('OK')
 
 })

@@ -21,6 +21,7 @@
     "express-useragent": "^1.0.15",
     "geoip-lite": "^1.4.2",
     "mongoose": "^5.10.11",
+    "raw-body": "^2.4.1",
     "shopify-api-node": "^3.5.2",
     "socket.io": "^2.3.0"
   },
