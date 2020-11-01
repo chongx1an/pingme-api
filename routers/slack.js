@@ -4,7 +4,19 @@ const Shopify = require('shopify-api-node')
 const { slack: slackConfig } = require('../config')
 const { Team, Store } = require('../models')
 
-router.post('/auth', async (req, res) => {
+router.get('/connect', async (req, res) => {
+
+    const scope = ['incoming-webhook', 'commands', 'chat:write'].join(",")
+    const clientId = slackConfig.clientId
+    const redirectUri = encodeURI('https://minimo-admin.netlify.app/slack/oauth')
+    
+    return res.json({
+        redirectTo: `https://slack.com/oauth/v2/authorize?scope=${scope}&client_id=${clientId}&redirect_uri=${redirectUri}`
+    })
+
+})
+
+router.get('/auth', async (req, res) => {
 
     const params = req.requirePermit(['code'], ['storeId'])
 
