@@ -4,15 +4,9 @@ const { Types } = require('mongoose')
 
 router.get('/:identifier', async (req, res) => {
 
-    const isId = Types.ObjectId.isValid(req.params.identifier)
-
-    let store
-
-    if(isId) {
-        store = await Store.findById(req.params.identifier)
-    } else {
-        store = await Store.findOne({ hostname: req.params.identifier })
-    }
+    const store = Types.ObjectId.isValid(req.params.identifier)
+    ? await Store.findById(req.params.identifier)
+    : await Store.findOne({ hostName: req.params.identifier })
 
     return res.json({ store })
 

@@ -11,7 +11,7 @@ const schema = mongoose.Schema({
         required: true,
         enum: ['shopify']
     },
-    hostname: {
+    hostName: {
         type: String,
         required: true
     },

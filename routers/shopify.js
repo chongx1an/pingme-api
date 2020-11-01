@@ -1,11 +1,12 @@
 const router = require('express').Router()
 const crypto = require('crypto')
-const { shopify: shopifyConfig } = require('../../config')
+const { shopify: shopifyConfig } = require('../config')
 const { default: Axios } = require('axios')
 const queryString = require('querystring')
-const Store = require('../../models/store')
+const Shopify = require('shopify-api-node')
+const Store = require('../models/store')
 
-router.post('/', async (req, res) => {
+router.post('/auth', async (req, res) => {
 
     let params = req.requirePermit(['code', 'hmac', 'shop', 'state', 'timestamp'])
 
@@ -34,11 +35,34 @@ router.post('/', async (req, res) => {
 
     const store = await Store.create({
         provider: 'shopify',
-        hostname: params.shop,
+        hostName: params.shop,
         accessToken: response.data.access_token,
     })
 
     return res.json({ store })
+
+})
+
+router.post('/webhooks/app/uninstalled', async(req, res) => {
+
+    const hostName = req.headers['x-shopify-shop-domain']
+
+    const store = await Store.findOne({ hostName })
+
+    const shopify = new Shopify({
+        shopName: store.hostName,
+        accessToken: store.accessToken
+    })
+
+    let res = shopify.scriptTag.list({
+        src: 'https://minimo-chatbox.surge.sh/script.js',
+    })
+
+    if(res.script_tags.length) {
+        await shopify.scriptTag.delete(res.script_tags[0].id)
+    }
+
+    return res.send('OK')
 
 })
 
