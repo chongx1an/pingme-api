@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const crypto = require('crypto')
 const { shopify: shopifyConfig } = require('../config')
-const { default: Axios } = require('axios')
+const ApiClient = require('../services/api-client')
 const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
 const Store = require('../models/store')
@@ -34,7 +34,7 @@ router.get('/install', async (req, res) => {
 
 })
 
-router.get('/auth', async (req, res) => {
+router.post('/auth', async (req, res) => {
 
     let params = req.requirePermit(['code', 'hmac', 'shop', 'state', 'timestamp'])
 
@@ -55,15 +55,10 @@ router.get('/auth', async (req, res) => {
         return res.error('Invalid hmac', 400)
     }
 
-    let response = await Axios.post(`https://${params.shop}/admin/oauth/access_token`, {
+    let response = await ApiClient.post(`https://${params.shop}/admin/oauth/access_token`, {
         client_id: shopifyConfig.apiKey,
         client_secret: shopifyConfig.apiSecretKey,
         code: params.code,
-    }, {
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
     }).catch(e => console.log(e.response.data))
 
     const store = await Store.create({
