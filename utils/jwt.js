@@ -1,16 +1,8 @@
 const jwt = require('jwt-simple')
 const { appSecret } = require('../config')
 
-const encode = payload => {
+const encode = payload => jwt.encode(payload, appSecret)
 
-    return jwt.encode(payload, appSecret)
-
-}
-
-const decode = token => {
-
-    return jwt.decode(token, appSecret)
-
-}
+const decode = token => jwt.decode(token, appSecret)
 
 module.exports = { encode, decode }
