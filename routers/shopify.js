@@ -34,7 +34,7 @@ router.get('/install', async (req, res) => {
 
 })
 
-router.post('/auth', async (req, res) => {
+router.get('/auth', async (req, res) => {
 
     let params = req.requirePermit(['code', 'hmac', 'shop', 'state', 'timestamp'])
 
