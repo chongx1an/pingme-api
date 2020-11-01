@@ -42,7 +42,7 @@ process.on('unhandledRejection', async function(reason, promise) {
             type: 'section',
             text: {
                 type: 'mrkdwn',
-                text: JSON.stringify(reason),
+                text: JSON.stringify({ promise, reason }),
             },
         }
     ]
