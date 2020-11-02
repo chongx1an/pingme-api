@@ -102,7 +102,7 @@ router.get('/auth', async (req, res) => {
 
 router.get('/view/products/:productId', async (req, res) => {
 
-    const { shop, productId, customerId, duration } = req.requirePermit(['shop', 'productId', 'customerId', 'duration'])
+    const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
     await Promise.all([
 
@@ -113,7 +113,6 @@ router.get('/view/products/:productId', async (req, res) => {
                     topic: 'view_product',
                     payload: {
                         productId,
-                        duration,
                     },
                 }
             }
@@ -149,7 +148,7 @@ router.get('/view/products/:productId', async (req, res) => {
 
 router.get('/view/collections/:collectionId', async (req, res) => {
 
-    const { shop, collectionId, customerId, duration } = req.requirePermit(['shop', 'collectionId', 'customerId', 'duration'])
+    const { shop, collectionId, customerId, duration } = req.requirePermit(['shop', 'collectionId', 'customerId'])
 
     await Promise.all([
 
@@ -160,7 +159,6 @@ router.get('/view/collections/:collectionId', async (req, res) => {
                     topic: 'view_collection',
                     payload: {
                         collectionId,
-                        duration,
                     },
                 }
             }
