@@ -61,8 +61,6 @@ router.get('/auth', async (req, res) => {
         code: params.code,
     })
 
-    console.log(response.data)
-
     // Upsert store in DB
     const store = await Store.findOneAndUpdate({
         provider: 'shopify',
@@ -74,8 +72,6 @@ router.get('/auth', async (req, res) => {
         new: true,
         upsert: true,
     })
-
-    console.log(store)
 
     const shopifyApi = new Shopify({
         shopName: store.shop,

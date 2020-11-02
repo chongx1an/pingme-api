@@ -21,6 +21,8 @@ const schema = mongoose.Schema({
 
 })
 
+schema.index({ shop: 1, customerId: 1, collectionId: 1 }, { unique: true })
+
 const CollectionView = mongoose.model('CollectionView', schema)
 
 module.exports = CollectionView
