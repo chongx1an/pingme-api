@@ -71,6 +71,7 @@ router.get('/auth', async (req, res) => {
         accessToken: response.data.access_token,
         deleted: false,
     }, {
+        new: true,
         upsert: true,
     })
 
