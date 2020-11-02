@@ -7,6 +7,11 @@ const schema = mongoose.Schema({
         required: true,
         enum: ['shopify']
     },
+    shop: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     accessToken: {
         type: String,
         required: true

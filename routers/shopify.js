@@ -6,6 +6,7 @@ const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
 const { Store, ProductView, CollectionView } = require('../models')
 const getRawBody = require('raw-body')
+const { Types } = require('mongoose')
 
 router.get('/install', async (req, res) => {
 
@@ -63,10 +64,11 @@ router.get('/auth', async (req, res) => {
         code: params.code,
     })
 
-    // Create store in DB
+    // Upsert store in DB
     const store = await Store.findByIdAndUpdate({
-        _id: params.shop,
+        _id: Types.ObjectId(params.shop),
         provider: 'shopify',
+        shop: params.shop,
     }, {
         accessToken: response.data.access_token,
         deleted: false,
@@ -75,7 +77,7 @@ router.get('/auth', async (req, res) => {
     })
 
     const shopifyApi = new Shopify({
-        shopName: store._id,
+        shopName: store.shop,
         accessToken: store.accessToken
     })
 
