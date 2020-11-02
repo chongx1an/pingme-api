@@ -10,12 +10,12 @@ router.get('/install', async (req, res) => {
 
     const { shop } = req.requirePermit(['shop'])
 
-    if(await Store.exists({ shop })) {
-        return res.json({
-            // redirectTo: `https://${shop}/admin/apps/${shopifyConfig.apiKey}`
-            redirectTo: `https://${shop}/admin/apps/minimo`
-        })
-    }
+    // if(await Store.exists({ shop })) {
+    //     return res.json({
+    //         // redirectTo: `https://${shop}/admin/apps/${shopifyConfig.apiKey}`
+    //         redirectTo: `https://${shop}/admin/apps/minimo`
+    //     })
+    // }
 
     const scope = ['read_products', 'read_customers', 'read_orders', 'write_script_tags'].join(',')
 
