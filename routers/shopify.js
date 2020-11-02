@@ -222,12 +222,12 @@ router.post('/webhooks/checkouts/create', async(req, res) => {
 
     const { line_items } = req.requirePermit(['line_items'])
 
-    await ProductView.updateMany({
-        customerId: line_items[0].customer.id,
-        productId: line_items.map(item => item.product_id)
-    }, {
-        lastBoughtAt: Date.now(),
-    })
+    // await ProductView.updateMany({
+    //     customerId: line_items[0].customer.id,
+    //     productId: line_items.map(item => item.product_id)
+    // }, {
+    //     lastBoughtAt: Date.now(),
+    // })
     
     return res.send('OK')
 
