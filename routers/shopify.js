@@ -9,11 +9,9 @@ const getRawBody = require('raw-body')
 
 router.get('/install', async (req, res) => {
 
-    const params = req.requirePermit(['shop'])
+    const { shop } = req.requirePermit(['shop'])
 
-    const store = await Store.findOne({ shop: params.shop })
-
-    if(store) {
+    if(await Store.exists({ shop })) {
         return res.json({
             redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
         })
@@ -64,7 +62,7 @@ router.get('/auth', async (req, res) => {
     })
 
     // Upsert store in DB
-    const store = await Store.findByIdAndUpdate({
+    const store = await Store.findOneAndUpdate({
         provider: 'shopify',
         shop: params.shop,
     }, {
