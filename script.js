@@ -10,7 +10,7 @@ if(customerId) {
 
   const template = location.pathname.split('/').reverse()[1]
 
-  window.onbeforeunload = function() {
+  window.onunload = function() {
 
     const leaveTime = new Date()
 
@@ -19,6 +19,8 @@ if(customerId) {
     if(template == 'products' || template == 'collections') {
 
       const handle = location.pathname.split('/').pop()
+
+      $.ajaxSetup({ async: false })
 
       if(template == 'products') {
         
