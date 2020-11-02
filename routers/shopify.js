@@ -13,7 +13,7 @@ router.get('/install', async (req, res) => {
 
     if(await Store.exists({ shop })) {
         return res.json({
-            redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
+            redirectTo: `https://${shop}/admin/apps/${shopifyConfig.apiKey}`
         })
     }
 
@@ -27,7 +27,7 @@ router.get('/install', async (req, res) => {
     })
 
     return res.json({
-        redirectTo: `https://${params.shop}/admin/oauth/authorize?${queryParams}`
+        redirectTo: `https://${shop}/admin/oauth/authorize?${queryParams}`
     })
 
 })
