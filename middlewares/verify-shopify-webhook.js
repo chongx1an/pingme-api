@@ -1,4 +1,5 @@
 const { shopifyConfig } = require('../config')
+const getRawBody = require('raw-body')
 
 module.exports = (req, res, next) => {
 
