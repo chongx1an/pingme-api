@@ -2,22 +2,26 @@ const customerId = __st ? __st.cid : null
 
 if(customerId) {
 
-    if(location.pathname.includes('/products/')) {
-      
-      const handle = location.pathname.split('/').pop()
-      
-      fetch(`/products/${handle}.json`)
-      .then(res => res.json())
-      .then(res => fetch(`https://the-pingme-api.herokuapp.com/shopify/view/products/${res.product.id}?hostName=${Shopify.shop}&customerId=${customerId}`))
-        
-    } else if(location.pathname.includes('/collections/')) {
-      
-      const handle = location.pathname.split('/').pop()
-      console.log(handle)
+    const template = location.pathname.split('/').reverse()[1]
 
-      fetch(`/collections/${handle}.json`)
-      .then(res => res.json())
-      .then(res => fetch(`https://the-pingme-api.herokuapp.com/shopify/view/collections/${res.collection.id}?hostName=${Shopify.shop}&customerId=${customerId}`))
+    if(template == 'products' || template == 'collections') {
+
+        const baseUrl = 'https://the-pingme-api.herokuapp.com/shopify/view'
+        const handle = location.pathname.split('/').pop()
+
+        if(template == 'products') {
+          
+          $.getJSON(`/products/${handle}.json`, res => {
+            $.get(`${baseUrl}/products/${res.product.id}?shop=${Shopify.shop}&customerId=${customerId}`)
+          })
+            
+        } else if(template == 'collections') {
+          
+          $.getJSON(`/collections/${handle}.json`, res => {
+            $.get(`${baseUrl}/collections/${res.collection.id}?shop=${Shopify.shop}&customerId=${customerId}`)
+          })
+
+        }
 
     }
 

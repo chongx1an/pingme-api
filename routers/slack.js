@@ -50,7 +50,7 @@ router.get('/auth', async (req, res) => {
         const store = await Store.findByIdAndUpdate(params.storeId, { teamId: team._id })
 
         const shopify = new Shopify({
-            shopName: store.hostName,
+            shopName: store._id,
             accessToken: store.accessToken
         })
 

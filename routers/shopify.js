@@ -9,13 +9,13 @@ const getRawBody = require('raw-body')
 
 router.get('/install', async (req, res) => {
 
-    const params = req.requirePermit(['hostName'])
+    const params = req.requirePermit(['shop'])
 
-    const store = await Store.findOne({ hostName: params.hostName })
+    const store = await Store.findOne({ shop: params.shop })
 
     if(store) {
         return res.json({
-            redirectTo: `https://${params.hostName}/admin/apps/${shopifyConfig.apiKey}`
+            redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
         })
     }
 
@@ -29,7 +29,7 @@ router.get('/install', async (req, res) => {
     })
 
     return res.json({
-        redirectTo: `https://${params.hostName}/admin/oauth/authorize?${queryParams}`
+        redirectTo: `https://${params.shop}/admin/oauth/authorize?${queryParams}`
     })
 
 })
@@ -64,21 +64,25 @@ router.get('/auth', async (req, res) => {
     })
 
     // Create store in DB
-    const store = await Store.create({
+    const store = await Store.findByIdAndUpdate({
+        _id: params.shop,
         provider: 'shopify',
-        hostName: params.shop,
+    }, {
         accessToken: response.data.access_token,
+        deleted: false,
+    }, {
+        upsert: true,
     })
 
     const shopifyApi = new Shopify({
-        shopName: store.hostName,
+        shopName: store._id,
         accessToken: store.accessToken
     })
 
     // Create script tag
     await shopifyApi.scriptTag.create({
         event: 'onload',
-        src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@b26be84/script.js',
+        src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@latest/script.js',
     })
 
     // Create uninstall app webhook
@@ -96,28 +100,17 @@ router.get('/auth', async (req, res) => {
 
 router.get('/view/products/:productId', async (req, res) => {
 
-    const { hostName, productId, customerId } = req.requirePermit(['hostName', 'productId', 'customerId'])
+    const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
-    const store = await Store.findOne({ hostName })
-
-    const view = await ProductView.findOne({
+    await ProductView.findOneAndUpdate({
+        storeId: shop,
         productId,
         customerId,
+    }, {
+        $push: { history: Date.now() }
+    }, {
+        upsert: true,
     })
-
-    if(view) {
-
-        await view.update({ $push: { history: Date.now() } })
-
-    } else {
-
-        await ProductView.create({
-            storeId: store._id,
-            productId,
-            customerId,
-        })
-
-    }
 
     return res.send('OK')
 
@@ -125,28 +118,17 @@ router.get('/view/products/:productId', async (req, res) => {
 
 router.get('/view/collections/:collectionId', async (req, res) => {
 
-    const { hostName, collectionId, customerId } = req.requirePermit(['hostName', 'collectionId', 'customerId'])
+    const { shop, collectionId, customerId } = req.requirePermit(['shop', 'collectionId', 'customerId'])
 
-    const store = await Store.findOne({ hostName })
-
-    const view = await CollectionView.findOne({
+    await CollectionView.findOneAndUpdate({
+        storeId: shop,
         collectionId,
         customerId,
+    }, {
+        $push: { history: Date.now() }
+    }, {
+        upsert: true,
     })
-
-    if(view) {
-
-        await view.update({ $push: { history: Date.now() } })
-
-    } else {
-
-        await CollectionView.create({
-            storeId: store._id,
-            collectionId,
-            customerId,
-        })
-
-    }
 
     return res.send('OK')
 
@@ -167,18 +149,16 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
         return res.error('invalid_hmac', 401)
     }
 
-    const hostName = req.headers['x-shopify-shop-domain']
-
-    const store = await Store.findOne({ hostName })
+    const shop = req.headers['x-shopify-shop-domain']
 
     const shopifyApi = new Shopify({
-        shopName: store.hostName,
+        shopName: shop,
         accessToken: store.accessToken
     })
 
     // Find and delete script tag
     let response = await shopifyApi.scriptTag.list({
-        src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@b26be84/script.js',
+        src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@latest/script.js',
     })
 
     if(response.script_tags.length) {
@@ -186,7 +166,7 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
     }
 
     // Soft delete store
-    await store.update({ deleted: true })
+    await Store.findByIdAndUpdate(shop, { deleted: true })
     
     return res.send('OK')
 
