@@ -97,11 +97,11 @@ router.get('/auth', async (req, res) => {
 
 })
 
-router.get('/view/products/:productId', async (req, res) => {
+router.get('/view/products/:productId', (req, res) => {
 
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
-    await ProductView.findOneAndUpdate({
+    ProductView.findOneAndUpdate({
         shop,
         productId,
         customerId,
@@ -115,11 +115,11 @@ router.get('/view/products/:productId', async (req, res) => {
 
 })
 
-router.get('/view/collections/:collectionId', async (req, res) => {
+router.get('/view/collections/:collectionId', (req, res) => {
 
     const { shop, collectionId, customerId } = req.requirePermit(['shop', 'collectionId', 'customerId'])
 
-    await CollectionView.findOneAndUpdate({
+    CollectionView.findOneAndUpdate({
         shop,
         collectionId,
         customerId,
