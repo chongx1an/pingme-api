@@ -12,7 +12,8 @@ router.get('/install', async (req, res) => {
 
     if(await Store.exists({ shop })) {
         return res.json({
-            redirectTo: `https://${shop}/admin/apps/${shopifyConfig.apiKey}`
+            // redirectTo: `https://${shop}/admin/apps/${shopifyConfig.apiKey}`
+            redirectTo: `https://${shop}/admin/apps/minimo`
         })
     }
 
