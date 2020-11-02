@@ -2,9 +2,8 @@ const mongoose = require('mongoose')
 
 const schema = mongoose.Schema({
 
-    storeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Store',
+    shop: {
+        type: String,
         required: true,
     },
     customerId: {

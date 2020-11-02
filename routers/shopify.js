@@ -6,7 +6,6 @@ const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
 const { Store, ProductView, CollectionView } = require('../models')
 const getRawBody = require('raw-body')
-const { Types } = require('mongoose')
 
 router.get('/install', async (req, res) => {
 
@@ -66,7 +65,6 @@ router.get('/auth', async (req, res) => {
 
     // Upsert store in DB
     const store = await Store.findByIdAndUpdate({
-        _id: Types.ObjectId(params.shop),
         provider: 'shopify',
         shop: params.shop,
     }, {
@@ -105,7 +103,7 @@ router.get('/view/products/:productId', async (req, res) => {
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
     await ProductView.findOneAndUpdate({
-        storeId: shop,
+        shop,
         productId,
         customerId,
     }, {
@@ -123,7 +121,7 @@ router.get('/view/collections/:collectionId', async (req, res) => {
     const { shop, collectionId, customerId } = req.requirePermit(['shop', 'collectionId', 'customerId'])
 
     await CollectionView.findOneAndUpdate({
-        storeId: shop,
+        shop,
         collectionId,
         customerId,
     }, {
