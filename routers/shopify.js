@@ -237,6 +237,8 @@ router.get('/products/:productId/cart', async (req, res) => {
         upsert: true,
     })
 
+    return res.sendStatus(200)
+
 })
 
 router.use('/webhooks', require('../middlewares/verify-shopify-webhook'))
