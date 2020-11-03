@@ -1,41 +1,65 @@
 const customerId = __st ? __st.cid : null
 
+const template = location.pathname.split('/').reverse()[1]
+
+const apiUrl = 'https://the-pingme-api.herokuapp.com/shopify'
+
+const isSpam = () => {
+
+  const previousTimestamp = localStorage.getItem(location.pathname)
+
+  return previousTimestamp && ((Date.now() - previousTimestamp) / 1000) < 5
+
+}
+
 if(customerId) {
 
-  const template = location.pathname.split('/').reverse()[1]
+  if(!isSpam()) {
 
-  const baseUrl = 'https://the-pingme-api.herokuapp.com/shopify'
+    localStorage.clear()
+    localStorage.setItem(location.pathname, Date.now())
 
-  if(template == '') {
+    switch (template) {
 
-    $.get(`${baseUrl}/home/view?shop=${Shopify.shop}&customerId=${customerId}`)
+      case '':
 
-  } else if(template == 'products') {
-
-    const handle = location.pathname.split('/').pop()
-
-    $.getJSON(`/products/${handle}.json`).then(res => {
-
-      // View product event
-      $.get(`${baseUrl}/products/${res.product.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
-
-      // Add to cart event
-      document.getElementsByClassName('btn product-form__cart-submit')[0].addEventListener('click', function() {
+        // View home event
+        $.get(`${apiUrl}/home/view?shop=${Shopify.shop}&customerId=${customerId}`)
         
-        $.get(`${baseUrl}/products/${res.product.id}/cart?shop=${Shopify.shop}&customerId=${customerId}`)
+      break
 
-      })
+      case 'products':
 
-    })
+        const handle = location.pathname.split('/').pop()
 
-  } else if(template == 'collections') {
+        $.getJSON(`/products/${handle}.json`).then(res => {
 
-    const handle = location.pathname.split('/').pop()
+          // View product event
+          $.get(`${apiUrl}/products/${res.product.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
 
-    // View collection event
-    $.getJSON(`/${template}/${handle}.json`, res => {
-      $.get(`${baseUrl}/collections/${res.collection.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
-    })
+          // Add to cart event
+          document.getElementsByClassName('btn product-form__cart-submit')[0].addEventListener('click', function() {
+            
+            $.get(`${apiUrl}/products/${res.product.id}/cart?shop=${Shopify.shop}&customerId=${customerId}`)
+
+          })
+
+        })
+
+      break
+
+      case 'collections':
+
+        const handle = location.pathname.split('/').pop()
+
+        // View collection event
+        $.getJSON(`/${template}/${handle}.json`, res => {
+          $.get(`${apiUrl}/collections/${res.collection.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
+        })
+
+      break
+
+    }
 
   }
 
