@@ -4,7 +4,7 @@ const { shopify: shopifyConfig } = require('../config')
 const ApiClient = require('../services/api-client')
 const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
-const { Store, Customer, Product, Collection, ProductView, CollectionView } = require('../models')
+const { Store, Customer, Product, Collection } = require('../models')
 
 router.post('/auth', async (req, res) => {
 
@@ -171,21 +171,10 @@ router.get('/view/products/:productId', async (req, res) => {
         }, {
             upsert: true
         })
-    
-        // ProductView.findOneAndUpdate({
-        //     shop,
-        //     productId,
-        //     customerId,
-        // }, {
-        //     $inc: { count: 1 },
-        //     $push: { history: Date.now() }
-        // }, {
-        //     upsert: true,
-        // })
 
     ])
 
-    return res.send('OK')
+    return res.sendStatus(200)
 
 })
 
@@ -217,21 +206,10 @@ router.get('/view/collections/:collectionId', async (req, res) => {
         }, {
             upsert: true
         })
-    
-        // CollectionView.findOneAndUpdate({
-        //     shop,
-        //     collectionId,
-        //     customerId,
-        // }, {
-        //     $inc: { count: 1 },
-        //     $push: { history: Date.now() }
-        // }, {
-        //     upsert: true,
-        // })
 
     ])
 
-    return res.send('OK')
+    return res.sendStatus(200)
 
 })
 
@@ -257,7 +235,7 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
         await shopifyApi.scriptTag.delete(response.script_tags[0].id)
     }
     
-    return res.send('OK')
+    return res.sendStatus(200)
 
 })
 
@@ -272,7 +250,7 @@ router.post('/webhooks/checkouts/create', async(req, res) => {
     //     lastBoughtAt: Date.now(),
     // })
     
-    return res.send('OK')
+    return res.sendStatus(200)
 
 })
 
