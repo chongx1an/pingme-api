@@ -9,7 +9,7 @@ if(customerId) {
         const handle = location.pathname.split('/').pop()
 
         $.getJSON(`/${template}/${handle}.json`, res => {
-          $.get(`https://the-pingme-api.herokuapp.com/shopify/view/${template}/${res[template].id}?shop=${Shopify.shop}&customerId=${customerId}`)
+          $.get(`https://the-pingme-api.herokuapp.com/shopify/view/${template}/${res[template.slice(0, -1)].id}?shop=${Shopify.shop}&customerId=${customerId}`)
         })
 
     }
