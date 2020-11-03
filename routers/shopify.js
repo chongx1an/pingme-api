@@ -182,7 +182,7 @@ router.get('/products/:productId/view', async (req, res) => {
 
 router.get('/collections/:collectionId/view', async (req, res) => {
 
-    const { shop, collectionId, customerId, duration } = req.requirePermit(['shop', 'collectionId', 'customerId'])
+    const { shop, collectionId, customerId } = req.requirePermit(['shop', 'collectionId', 'customerId'])
 
     await Promise.all([
 
@@ -219,9 +219,11 @@ router.get('/collections/:collectionId/view', async (req, res) => {
 
 router.get('/products/:productId/cart', async (req, res) => {
 
+    const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
+
     await Customer.findOneAndUpdate({
         id: customerId,
-        shop
+        shop,
     }, {
         $push: {
             events: {
