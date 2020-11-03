@@ -143,14 +143,16 @@ router.get('/auth', async (req, res) => {
 
 })
 
-router.get('/view/products/:productId', async (req, res) => {
+router.get('/products/:productId/view', async (req, res) => {
 
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
     await Promise.all([
 
-        Customer.findOneAndUpdate({ id: customerId }, {
+        Customer.findOneAndUpdate({
+            id: customerId,
             shop,
+        }, {
             $push: {
                 events: {
                     topic: 'view_product',
@@ -178,14 +180,16 @@ router.get('/view/products/:productId', async (req, res) => {
 
 })
 
-router.get('/view/collections/:collectionId', async (req, res) => {
+router.get('/collections/:collectionId/view', async (req, res) => {
 
     const { shop, collectionId, customerId, duration } = req.requirePermit(['shop', 'collectionId', 'customerId'])
 
     await Promise.all([
 
-        Customer.findOneAndUpdate({ id: customerId }, {
+        Customer.findOneAndUpdate({
+            id: customerId,
             shop,
+        }, {
             $push: {
                 events: {
                     topic: 'view_collection',
@@ -210,6 +214,26 @@ router.get('/view/collections/:collectionId', async (req, res) => {
     ])
 
     return res.sendStatus(200)
+
+})
+
+router.get('/products/:productId/cart', async (req, res) => {
+
+    await Customer.findOneAndUpdate({
+        id: customerId,
+        shop
+    }, {
+        $push: {
+            events: {
+                topic: 'add_to_cart',
+                payload: {
+                    productId,
+                },
+            }
+        }
+    }, {
+        upsert: true,
+    })
 
 })
 
