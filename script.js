@@ -6,7 +6,11 @@ if(customerId) {
 
   const baseUrl = 'https://the-pingme-api.herokuapp.com/shopify'
 
-  if(template == 'products') {
+  if(template == '') {
+
+    $.get(`${baseUrl}/home/view?shop=${Shopify.shop}&customerId=${customerId}`)
+
+  } else if(template == 'products') {
 
     const handle = location.pathname.split('/').pop()
 
