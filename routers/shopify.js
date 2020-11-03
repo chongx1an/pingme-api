@@ -38,8 +38,8 @@ router.post('/auth', async (req, res) => {
             format: 'json',
         }),
         shopifyApi.webhook.create({
-            topic: 'checkouts/create',
-            address: 'https://the-pingme-api.herokuapp.com/shopify/webhooks/checkouts/create',
+            topic: 'orders/create',
+            address: 'https://the-pingme-api.herokuapp.com/shopify/webhooks/orders/create',
             format: 'json',
         })
     ])
@@ -131,8 +131,8 @@ router.get('/auth', async (req, res) => {
             format: 'json',
         }),
         shopifyApi.webhook.create({
-            topic: 'checkouts/create',
-            address: 'https://the-pingme-api.herokuapp.com/shopify/webhooks/checkouts/create',
+            topic: 'orders/create',
+            address: 'https://the-pingme-api.herokuapp.com/shopify/webhooks/orders/create',
             format: 'json',
         })
     ])
@@ -140,6 +140,27 @@ router.get('/auth', async (req, res) => {
     return res.json({
         redirectTo: `https://${params.shop}/admin/apps/${shopifyConfig.apiKey}`
     })
+
+})
+
+router.get('/home/view', async (req, res) => {
+
+    const { shop, customerId } = req.requirePermit(['shop', 'customerId'])
+
+    await Customer.findOneAndUpdate({
+        id: customerId,
+        shop,
+    }, {
+        $push: {
+            events: {
+                topic: 'view_home',
+            }
+        }
+    }, {
+        upsert: true,
+    })
+
+    return res.sendStatus(200)
 
 })
 
@@ -269,7 +290,7 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
 
 router.post('/webhooks/checkouts/create', async(req, res) => {
 
-    const { line_items } = req.requirePermit(['line_items'])
+    // const { line_items } = req.requirePermit(['line_items'])
 
     // await ProductView.updateMany({
     //     customerId: line_items[0].customer.id,
@@ -277,6 +298,33 @@ router.post('/webhooks/checkouts/create', async(req, res) => {
     // }, {
     //     lastBoughtAt: Date.now(),
     // })
+    
+    return res.sendStatus(200)
+
+})
+
+router.post('/webhooks/orders/create', async(req, res) => {
+
+    const params = req.requirePermit(['id', 'customer', 'created_at'])
+
+    const shop = req.get('X-Shopify-Shop-Domain')
+
+    await Customer.findOneAndUpdate({
+        id: params.customer.id,
+        shop,
+    }, {
+        $push: {
+            events: {
+                topic: 'create_order',
+                timestamp: new Date(params.created_at),
+                payload: {
+                    orderId: params.id,
+                }
+            }
+        }
+    }, {
+        upsert: true,
+    })
     
     return res.sendStatus(200)
 

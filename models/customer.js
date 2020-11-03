@@ -13,7 +13,7 @@ const schema = mongoose.Schema({
     events: [{
         topic: {
             type: String,
-            enum: ['view_product', 'view_collection', 'add_to_cart'],
+            enum: ['view_home', 'view_product', 'view_collection', 'add_to_cart'],
             required: true,
         },
         payload: Object,
