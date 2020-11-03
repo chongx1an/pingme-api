@@ -6,16 +6,58 @@ const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
 const { Store, Customer, Product, Collection, ProductView, CollectionView } = require('../models')
 
+router.post('/auth', async (req, res) => {
+
+    const { shop, accessToken } = req.requirePermit(['shop', 'accessToken'])
+
+    // Upsert store in DB
+    const store = await Store.findOneAndUpdate({
+        provider: 'shopify',
+        shop,
+    }, {
+        accessToken,
+        deleted: false,
+    }, {
+        new: true,
+        upsert: true,
+    })
+
+    const shopifyApi = new Shopify({
+        shopName: store.shop,
+        accessToken: store.accessToken
+    })
+
+    await Promise.all([
+        shopifyApi.scriptTag.create({
+            event: 'onload',
+            src: 'https://cdn.jsdelivr.net/gh/chongx1an/pingme-api@latest/script.js',
+        }),
+        shopifyApi.webhook.create({
+            topic: 'app/uninstalled',
+            address: 'https://the-pingme-api.herokuapp.com/shopify/webhooks/app/uninstalled',
+            format: 'json',
+        }),
+        shopifyApi.webhook.create({
+            topic: 'checkouts/create',
+            address: 'https://the-pingme-api.herokuapp.com/shopify/webhooks/checkouts/create',
+            format: 'json',
+        })
+    ])
+
+    return res.sendStatus(200)
+
+})
+
 router.get('/install', async (req, res) => {
 
     const { shop } = req.requirePermit(['shop'])
 
-    // if(await Store.exists({ shop })) {
-    //     return res.json({
-    //         // redirectTo: `https://${shop}/admin/apps/${shopifyConfig.apiKey}`
-    //         redirectTo: `https://${shop}/admin/apps/minimo`
-    //     })
-    // }
+    if(await Store.exists({ shop })) {
+        return res.json({
+            // redirectTo: `https://${shop}/admin/apps/${shopifyConfig.apiKey}`
+            redirectTo: `https://${shop}/admin/apps/minimo`
+        })
+    }
 
     const scope = ['read_products', 'read_customers', 'read_orders', 'write_script_tags'].join(',')
 
