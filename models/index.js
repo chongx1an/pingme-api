@@ -5,7 +5,4 @@ module.exports = {
     Customer: require('./customer'),
     Product: require('./product'),
     Collection: require('./collection'),
-    
-    ProductView: require('./product-view'),
-    CollectionView: require('./collection-view'),
 }
