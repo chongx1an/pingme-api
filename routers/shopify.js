@@ -1,10 +1,6 @@
 const router = require('express').Router()
-const crypto = require('crypto')
-const { shopify: shopifyConfig } = require('../config')
-const ApiClient = require('../services/api-client')
-const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
-const { Store, Customer, Product, Collection, Event } = require('../models')
+const { Store, Event } = require('../models')
 
 router.get('/populate', async (_, res) => {
 
