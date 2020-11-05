@@ -37,6 +37,8 @@ process.on('uncaughtException', async function (err) {
 
 process.on('unhandledRejection', async function(reason, promise) {
 
+    console.log(reason)
+
     const blocks = [
         {
             type: 'section',
