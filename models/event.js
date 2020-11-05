@@ -23,7 +23,7 @@ const schema = mongoose.Schema({
 
 })
 
-schema.index({ shop: 1, customerId: 1 }, { unique: true })
+schema.index({ shop: 1, customerId: 1 })
 
 const Event = mongoose.model('Event', schema)
 
