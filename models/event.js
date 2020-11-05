@@ -12,7 +12,7 @@ const schema = mongoose.Schema({
     },
     topic: {
         type: String,
-        enum: ['view_home', 'view_product', 'view_collection', 'add_to_cart'],
+        enum: ['view_home', 'view_product', 'view_collection', 'add_to_cart', 'begin_checkout', 'purchased'],
         required: true,
     },
     payload: Object,
@@ -21,6 +21,8 @@ const schema = mongoose.Schema({
         default: Date.now(),
     },
 
+}, {
+    timestamps: true,
 })
 
 schema.index({ shop: 1, customerId: 1 })

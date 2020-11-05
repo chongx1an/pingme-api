@@ -8,27 +8,9 @@ const { Store, Customer, Product, Collection, Event } = require('../models')
 
 router.get('/populate', async (_, res) => {
 
-    const customers = await Customer.find()
+    const events = await Event.find()
 
-    let events = []
-
-    customers.forEach(customer => {
-
-        customer.events.forEach(event => {
-
-            events.push({
-                shop: customer.shop,
-                customerId: customer.id,
-                topic: event.topic,
-                timestamp: event.timestamp,
-                payload: event.payload,
-            })
-
-        })
-
-    })
-
-    await Event.insertMany(events).catch(e => res.json(e))
+    await Promise.all(events.map(event => event.update({ createdAt: event.timestamp })))
 
     return res.sendStatus(200)
 
@@ -175,17 +157,10 @@ router.get('/home/view', async (req, res) => {
 
     const { shop, customerId } = req.requirePermit(['shop', 'customerId'])
 
-    await Customer.findOneAndUpdate({
-        id: customerId,
+    await Event.create({
         shop,
-    }, {
-        $push: {
-            events: {
-                topic: 'view_home',
-            }
-        }
-    }, {
-        upsert: true,
+        customerId,
+        topic: 'view_home',
     })
 
     return res.sendStatus(200)
@@ -196,34 +171,14 @@ router.get('/products/:productId/view', async (req, res) => {
 
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
-    await Promise.all([
-
-        Customer.findOneAndUpdate({
-            id: customerId,
-            shop,
-        }, {
-            $push: {
-                events: {
-                    topic: 'view_product',
-                    payload: {
-                        productId,
-                    },
-                }
-            }
-        }, {
-            upsert: true,
-        }),
-
-        Product.findOneAndUpdate({
-            id: productId,
-            shop,
-        }, {
-            $inc: { views: 1 },
-        }, {
-            upsert: true
-        })
-
-    ])
+    await Event.create({
+        shop,
+        customerId,
+        topic: 'view_product',
+        payload: {
+            productId,
+        }
+    })
 
     return res.sendStatus(200)
 
@@ -233,34 +188,14 @@ router.get('/collections/:collectionId/view', async (req, res) => {
 
     const { shop, collectionId, customerId } = req.requirePermit(['shop', 'collectionId', 'customerId'])
 
-    await Promise.all([
-
-        Customer.findOneAndUpdate({
-            id: customerId,
-            shop,
-        }, {
-            $push: {
-                events: {
-                    topic: 'view_collection',
-                    payload: {
-                        collectionId,
-                    },
-                }
-            }
-        }, {
-            upsert: true,
-        }),
-
-        Collection.findOneAndUpdate({
-            id: collectionId,
-            shop,
-        }, {
-            $inc: { views: 1 },
-        }, {
-            upsert: true
-        })
-
-    ])
+    await Event.create({
+        shop,
+        customerId,
+        topic: 'view_collection',
+        payload: {
+            collectionId,
+        }
+    })
 
     return res.sendStatus(200)
 
@@ -270,20 +205,13 @@ router.get('/products/:productId/cart', async (req, res) => {
 
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
-    await Customer.findOneAndUpdate({
-        id: customerId,
+    await Event.create({
         shop,
-    }, {
-        $push: {
-            events: {
-                topic: 'add_to_cart',
-                payload: {
-                    productId,
-                },
-            }
+        customerId,
+        topic: 'add_to_cart',
+        payload: {
+            productId,
         }
-    }, {
-        upsert: true,
     })
 
     return res.sendStatus(200)
@@ -318,14 +246,19 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
 
 router.post('/webhooks/checkouts/create', async(req, res) => {
 
-    // const { line_items } = req.requirePermit(['line_items'])
+    const params = req.requirePermit(['customer', 'line_items', 'created_at'])
 
-    // await ProductView.updateMany({
-    //     customerId: line_items[0].customer.id,
-    //     productId: line_items.map(item => item.product_id)
-    // }, {
-    //     lastBoughtAt: Date.now(),
-    // })
+    const shop = req.get('X-Shopify-Shop-Domain')
+
+    await Event.create({
+        shop,
+        customerId: params.customer.id,
+        topic: 'begin_checkout',
+        timestamp: new Date(params.created_at),
+        payload: {
+            productIds: params.line_items.map(item => item.product_id),
+        }
+    })
     
     return res.sendStatus(200)
 
@@ -333,25 +266,19 @@ router.post('/webhooks/checkouts/create', async(req, res) => {
 
 router.post('/webhooks/orders/create', async(req, res) => {
 
-    const params = req.requirePermit(['id', 'customer', 'created_at'])
+    const params = req.requirePermit(['id', 'customer', 'line_items', 'created_at'])
 
     const shop = req.get('X-Shopify-Shop-Domain')
 
-    await Customer.findOneAndUpdate({
-        id: params.customer.id,
+    await Event.create({
         shop,
-    }, {
-        $push: {
-            events: {
-                topic: 'create_order',
-                timestamp: new Date(params.created_at),
-                payload: {
-                    orderId: params.id,
-                }
-            }
-        }
-    }, {
-        upsert: true,
+        customerId: params.customer.id,
+        topic: 'purchased',
+        timestamp: new Date(params.created_at),
+        payload: {
+            orderId: params.id,
+            productIds: params.line_items.map(item => item.product_id),
+        },
     })
     
     return res.sendStatus(200)
