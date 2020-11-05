@@ -3,7 +3,7 @@ const { Event } = require('../models')
 
 router.get('/', async (req, res) => {
 
-    const customerViewProducts = await Event.aggregate([
+    const productViews = await Event.aggregate([
         {
             $match: {
                 topic: 'view_product',
@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
         },
         {
             $group: {
-                _id: '$customerId',
+                _id: { customerId: '$customerId', productId: '$payload.productId' },
                 viewProductCount: { $sum: 1 },
             },
         },
@@ -19,10 +19,18 @@ router.get('/', async (req, res) => {
             $match: {
                 viewProductCount: { $gte: 2 },
             },
+        },
+        {
+            $project: {
+                _id: 0,
+                customerId: '$_id.customerId',
+                productId: '$_id.productId',
+                viewProductCount: 1
+            }
         }
     ])
 
-    const customerViewCollection = await Event.aggregate([
+    const collectionViews = await Event.aggregate([
         {
             $match: {
                 topic: 'view_collection',
@@ -30,7 +38,7 @@ router.get('/', async (req, res) => {
         },
         {
             $group: {
-                _id: '$customerId',
+                _id: { customerId: '$customerId', collectionId: '$payload.collectionId' },
                 viewCollectionCount: { $sum: 1 },
             },
         },
@@ -38,12 +46,20 @@ router.get('/', async (req, res) => {
             $match: {
                 viewCollectionCount: { $gte: 2 },
             },
+        },
+        {
+            $project: {
+                _id: 0,
+                customerId: '$_id.customerId',
+                collectionId: '$_id.collectionId',
+                viewCollectionCount: 1
+            }
         }
     ])
 
     return res.json({
-        customerViewProducts,
-        customerViewCollection,
+        productViews,
+        collectionViews,
     })
 
 })
