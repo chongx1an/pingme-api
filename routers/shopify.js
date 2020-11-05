@@ -28,7 +28,7 @@ router.get('/populate', async (_, res) => {
 
     })
 
-    await Event.insertMany(events)
+    await Event.insertMany(events).catch(e => res.json(e))
 
     return res.sendStatus(200)
 
