@@ -9,15 +9,15 @@ const isSpam = () => {
   // const previousTimestamp = localStorage.getItem(location.pathname)
 
   // return previousTimestamp && ((Date.now() - previousTimestamp) / 1000) < 5
-  
+
   return false
 
 }
 
 if(customerId && !isSpam()) {
 
-  localStorage.clear()
-  localStorage.setItem(location.pathname, Date.now())
+  // localStorage.clear()
+  // localStorage.setItem(location.pathname, Date.now())
 
   switch (template) {
 
