@@ -68,6 +68,7 @@ router.get('/', async (req, res) => {
         accessToken: store.accessToken
     })
 
+    // List customers
     const customerIds = [...productViews.map(view => view.customerId), ...collectionViews.map(view => view.customerId)].join(',')
     const customerFields = ['id', 'first_name', 'last_name', 'email', 'phone', 'orders_count'].join(',')
 
@@ -76,6 +77,7 @@ router.get('/', async (req, res) => {
         fields: customerFields,
     })
 
+    // List products
     const productIds = productViews.map(view => view.productId).join(',')
     const productFields = ['id', 'title', 'image'].join(',')
 
@@ -84,7 +86,10 @@ router.get('/', async (req, res) => {
         fields: productFields,
     })
 
-    products = products.map(product => ({...product, image: product.image.src}))
+    products = products.map(product => ({
+        ...product,
+        image: product.image.src
+    }))
 
     productViews = productViews.map(view => ({
         ...view,
@@ -92,10 +97,15 @@ router.get('/', async (req, res) => {
         product: products.find(product => product.id == view.productId),
     }))
 
+    // List collections
     const collectionIds = collectionViews.map(view => view.collectionId)
 
-    let collections = await Promise.all(collectionIds.map(id => shopifyApi.collection.get(id)))
-    collections = collections.map(collection => collection.collection)
+    let collections = await Promise.all(collectionIds.map(id => shopifyApi.collection.get(id, { fields: 'title,image' })))
+
+    collections = collections.map(collection => ({
+        ...collection,
+        image: collection.image ? collection.image.src : null,
+    }))
 
     collectionViews = collectionViews.map(view => ({
         ...view,
