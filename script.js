@@ -19,6 +19,8 @@ if(customerId && !isSpam()) {
   // localStorage.clear()
   // localStorage.setItem(location.pathname, Date.now())
 
+  let handle
+
   switch (template) {
 
     case '':
@@ -30,7 +32,7 @@ if(customerId && !isSpam()) {
 
     case 'products':
 
-      const handle = location.pathname.split('/').pop()
+      handle = location.pathname.split('/').pop()
 
       $.getJSON(`/products/${handle}.json`).then(res => {
 
@@ -50,7 +52,7 @@ if(customerId && !isSpam()) {
 
     case 'collections':
 
-      const handle = location.pathname.split('/').pop()
+      handle = location.pathname.split('/').pop()
 
       // View collection event
       $.getJSON(`/${template}/${handle}.json`, res => {
