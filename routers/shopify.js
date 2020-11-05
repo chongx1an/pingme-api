@@ -279,6 +279,17 @@ router.post('/webhooks/orders/create', async(req, res) => {
         'payload.productId': { $in: productIds },
     })
 
+    const data = productIds.map(productId => ({
+        shop,
+        customerId: params.customer.id,
+        topic: 'purchased',
+        payload: {
+            productId,
+        }
+    }))
+
+    await Event.insertMany(data)
+
     return res.sendStatus(200)
 
 })
