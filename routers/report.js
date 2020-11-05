@@ -5,7 +5,9 @@ const Store = require('../models/store')
 
 router.get('/', async (req, res) => {
 
-    const store = await Store.findOne()
+    const shop = 'posta-show-case.myshopify.com'
+
+    const store = await Store.findOne({ shop })
 
     let productViews = await Event.aggregate([
         {
@@ -67,14 +69,14 @@ router.get('/', async (req, res) => {
     })
 
     const customerIds = [...productViews.map(view => view.customerId), ...collectionViews.map(view => view.customerId)].join(',')
-    const customerFields = ['id', 'first_name', 'last_name', 'orders_count'].join(',')
+    const customerFields = ['id', 'first_name', 'last_name', 'email', 'phone', 'orders_count'].join(',')
 
     const customers = await shopifyApi.customer.list({
         ids: customerIds,
         fields: customerFields,
     })
 
-    const productIds = [...productViews.map(view => view.productId), ...collectionViews.map(view => view.productId)].join(',')
+    const productIds = productViews.map(view => view.productId).join(',')
     const productFields = ['id', 'title', 'image'].join(',')
 
     let products = await shopifyApi.product.list({
@@ -90,9 +92,15 @@ router.get('/', async (req, res) => {
         product: products.find(product => product.id == view.productId),
     }))
 
+    const collectionIds = collectionViews.map(view => view.collectionId)
+
+    let collections = await Promise.all(collectionIds.map(id => shopifyApi.collection.get(id)))
+    collections = collections.map(collection => collection.collection)
+
     collectionViews = collectionViews.map(view => ({
         ...view,
         customer: customers.find(customer => customer.id == view.customerId),
+        collection: collections.find(collection => collection.id == view.collectionId)
     }))
 
     return res.json({
