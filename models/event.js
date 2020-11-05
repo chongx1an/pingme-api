@@ -16,7 +16,7 @@ const schema = mongoose.Schema({
         required: true,
     },
     payload: Object,
-    timestamp: {
+    createdAt: {
         type: Date,
         default: Date.now(),
     },

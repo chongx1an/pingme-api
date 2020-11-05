@@ -254,10 +254,10 @@ router.post('/webhooks/checkouts/create', async(req, res) => {
         shop,
         customerId: params.customer.id,
         topic: 'begin_checkout',
-        timestamp: new Date(params.created_at),
         payload: {
             productIds: params.line_items.map(item => item.product_id),
-        }
+        },
+        createdAt: params.created_at
     })
     
     return res.sendStatus(200)
@@ -274,11 +274,11 @@ router.post('/webhooks/orders/create', async(req, res) => {
         shop,
         customerId: params.customer.id,
         topic: 'purchased',
-        timestamp: new Date(params.created_at),
         payload: {
             orderId: params.id,
             productIds: params.line_items.map(item => item.product_id),
         },
+        createdAt: params.created_at,
     })
     
     return res.sendStatus(200)
