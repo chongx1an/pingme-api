@@ -39,12 +39,27 @@ process.on('unhandledRejection', async function(reason, promise) {
 
     console.log(reason)
 
+    let reason = reason.split('\n')
+    const firstLine = reason.shift()
+
+    reason = [`*${firstLine}*\n`, ...reason].join('\n')
+
     const blocks = [
+        {
+            type: 'header',
+            text: {
+                type: 'plain_text',
+                text: 'API',
+            }
+        },
+        {
+			type: 'divider'
+        },
         {
             type: 'section',
             text: {
                 type: 'mrkdwn',
-                text: JSON.stringify({ promise, reason }),
+                text: reason,
             },
         }
     ]
