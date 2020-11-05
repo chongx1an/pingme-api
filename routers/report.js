@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const { Event } = require('../models')
 
-router.get('/report', async (req, res) => {
+router.get('/', async (req, res) => {
 
     const customerViewProducts = await Event.aggregate([
         {
