@@ -38,35 +38,36 @@ process.on('uncaughtException', async function (err) {
 process.on('unhandledRejection', async function(reason, promise) {
 
     console.log(reason)
+    console.log(Object.keys(reason))
 
-    let reason = reason.split('\n')
-    const firstLine = reason.shift()
+    // reason = reason.split('\n')
+    // const firstLine = reason.shift()
 
-    reason = [`*${firstLine}*\n`, ...reason].join('\n')
+    // reason = [`*${firstLine}*\n`, ...reason].join('\n')
 
-    const blocks = [
-        {
-            type: 'header',
-            text: {
-                type: 'plain_text',
-                text: 'API',
-            }
-        },
-        {
-			type: 'divider'
-        },
-        {
-            type: 'section',
-            text: {
-                type: 'mrkdwn',
-                text: reason,
-            },
-        }
-    ]
+    // const blocks = [
+    //     {
+    //         type: 'header',
+    //         text: {
+    //             type: 'plain_text',
+    //             text: 'API',
+    //         }
+    //     },
+    //     {
+	// 		type: 'divider'
+    //     },
+    //     {
+    //         type: 'section',
+    //         text: {
+    //             type: 'mrkdwn',
+    //             text: reason,
+    //         },
+    //     }
+    // ]
 
-    await Slack.chat.postMessage({
-        channel: '#errors',
-        blocks,
-    })
+    // await Slack.chat.postMessage({
+    //     channel: '#errors',
+    //     blocks,
+    // })
 
 })

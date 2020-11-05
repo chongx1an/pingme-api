@@ -1,7 +1,11 @@
 const router = require('express').Router()
+const Shopify = require('shopify-api-node')
 const { Event } = require('../models')
+const Store = require('../models/store')
 
 router.get('/', async (req, res) => {
+
+    const store = await Store.findOne()
 
     const productViews = await Event.aggregate([
         {
@@ -56,6 +60,29 @@ router.get('/', async (req, res) => {
             }
         }
     ])
+
+    const customerIds = [...productViews.map(view => view.customerId), ...collectionViews.map(view => view.customerId)]
+
+    console.log(store)
+
+    const shopifyApi = new Shopify({
+        shopName: store.shop,
+        accessToken: store.accessToken
+    })
+
+    const customers = await shopifyApi.customer.list({
+        ids: customerIds.join(','),
+    })
+
+    productViews = productViews.map(view => ({
+        ...view,
+        customer: customers.find(customer => customer.id == view.customerId)
+    }))
+
+    collectionViews = collectionViews.map(view => ({
+        ...view,
+        customer: customers.find(customer => customer.id == view.customerId)
+    }))
 
     return res.json({
         productViews,
