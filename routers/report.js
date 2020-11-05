@@ -68,6 +68,7 @@ router.get('/', async (req, res) => {
         accessToken: store.accessToken
     })
 
+
     // List customers
     const customerIds = [...productViews.map(view => view.customerId), ...collectionViews.map(view => view.customerId)].join(',')
     const customerFields = ['id', 'first_name', 'last_name', 'email', 'phone', 'orders_count'].join(',')
@@ -76,6 +77,7 @@ router.get('/', async (req, res) => {
         ids: customerIds,
         fields: customerFields,
     })
+
 
     // List products
     const productIds = productViews.map(view => view.productId).join(',')
@@ -97,6 +99,7 @@ router.get('/', async (req, res) => {
         product: products.find(product => product.id == view.productId),
     }))
 
+
     // List collections
     const collectionIds = collectionViews.map(view => view.collectionId)
 
@@ -113,6 +116,7 @@ router.get('/', async (req, res) => {
         collection: collections.find(collection => collection.id == view.collectionId)
     }))
 
+    // Return result
     return res.json({
         productViews,
         collectionViews,

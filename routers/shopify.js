@@ -246,19 +246,20 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
 
 router.post('/webhooks/checkouts/create', async(req, res) => {
 
-    const params = req.requirePermit(['customer', 'line_items', 'created_at'])
+    const params = req.requirePermit(['customer', 'line_items'])
 
     const shop = req.get('X-Shopify-Shop-Domain')
 
-    await Event.create({
+    const data = params.line_items.map(item => ({
         shop,
         customerId: params.customer.id,
         topic: 'begin_checkout',
         payload: {
-            productIds: params.line_items.map(item => item.product_id),
+            productId: item.product_id,
         },
-        createdAt: params.created_at
-    })
+    }))
+
+    await Event.insertMany(data)
     
     return res.sendStatus(200)
 
@@ -266,21 +267,18 @@ router.post('/webhooks/checkouts/create', async(req, res) => {
 
 router.post('/webhooks/orders/create', async(req, res) => {
 
-    const params = req.requirePermit(['id', 'customer', 'line_items', 'created_at'])
+    const params = req.requirePermit(['id', 'customer', 'line_items'])
 
     const shop = req.get('X-Shopify-Shop-Domain')
 
-    await Event.create({
+    const productIds = params.line_items.map(item => item.product_id)
+
+    await Event.deleteMany({
         shop,
         customerId: params.customer.id,
-        topic: 'purchased',
-        payload: {
-            orderId: params.id,
-            productIds: params.line_items.map(item => item.product_id),
-        },
-        createdAt: params.created_at,
+        'payload.productId': { $in: productIds },
     })
-    
+
     return res.sendStatus(200)
 
 })
