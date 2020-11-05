@@ -12,54 +12,50 @@ const isSpam = () => {
 
 }
 
-if(customerId) {
+if(customerId && !isSpam()) {
 
-  if(!isSpam()) {
+  localStorage.clear()
+  localStorage.setItem(location.pathname, Date.now())
 
-    localStorage.clear()
-    localStorage.setItem(location.pathname, Date.now())
+  switch (template) {
 
-    switch (template) {
+    case '':
 
-      case '':
+      // View home event
+      $.get(`${apiUrl}/home/view?shop=${Shopify.shop}&customerId=${customerId}`)
+      
+    break
 
-        // View home event
-        $.get(`${apiUrl}/home/view?shop=${Shopify.shop}&customerId=${customerId}`)
-        
-      break
+    case 'products':
 
-      case 'products':
+      const handle = location.pathname.split('/').pop()
 
-        const handle = location.pathname.split('/').pop()
+      $.getJSON(`/products/${handle}.json`).then(res => {
 
-        $.getJSON(`/products/${handle}.json`).then(res => {
+        // View product event
+        $.get(`${apiUrl}/products/${res.product.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
 
-          // View product event
-          $.get(`${apiUrl}/products/${res.product.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
-
-          // Add to cart event
-          document.getElementsByClassName('btn product-form__cart-submit')[0].addEventListener('click', function() {
-            
-            $.get(`${apiUrl}/products/${res.product.id}/cart?shop=${Shopify.shop}&customerId=${customerId}`)
-
-          })
+        // Add to cart event
+        document.getElementsByClassName('btn product-form__cart-submit')[0].addEventListener('click', function() {
+          
+          $.get(`${apiUrl}/products/${res.product.id}/cart?shop=${Shopify.shop}&customerId=${customerId}`)
 
         })
 
-      break
+      })
 
-      case 'collections':
+    break
 
-        const handle = location.pathname.split('/').pop()
+    case 'collections':
 
-        // View collection event
-        $.getJSON(`/${template}/${handle}.json`, res => {
-          $.get(`${apiUrl}/collections/${res.collection.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
-        })
+      const handle = location.pathname.split('/').pop()
 
-      break
+      // View collection event
+      $.getJSON(`/${template}/${handle}.json`, res => {
+        $.get(`${apiUrl}/collections/${res.collection.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
+      })
 
-    }
+    break
 
   }
 

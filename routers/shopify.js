@@ -4,7 +4,35 @@ const { shopify: shopifyConfig } = require('../config')
 const ApiClient = require('../services/api-client')
 const queryString = require('querystring')
 const Shopify = require('shopify-api-node')
-const { Store, Customer, Product, Collection } = require('../models')
+const { Store, Customer, Product, Collection, Event } = require('../models')
+
+router.get('/populate', async (_, res) => {
+
+    const customers = await Customer.find()
+
+    let events = []
+
+    customers.forEach(customer => {
+
+        customer.events.forEach(event => {
+
+            events.push({
+                shop: customer.shop,
+                customerId: customer.id,
+                topic: event.topic,
+                timestamp: event.timestamp,
+                payload: event.payload,
+            })
+
+        })
+
+    })
+
+    await Event.insertMany(events)
+
+    return res.sendStatus(200)
+
+})
 
 router.post('/auth', async (req, res) => {
 
