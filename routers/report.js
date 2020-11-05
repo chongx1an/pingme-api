@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
 
     const store = await Store.findOne()
 
-    const productViews = await Event.aggregate([
+    let productViews = await Event.aggregate([
         {
             $match: {
                 topic: 'view_product',
@@ -16,12 +16,12 @@ router.get('/', async (req, res) => {
         {
             $group: {
                 _id: { customerId: '$customerId', productId: '$payload.productId' },
-                viewProductCount: { $sum: 1 },
+                views: { $sum: 1 },
             },
         },
         {
             $match: {
-                viewProductCount: { $gte: 2 },
+                views: { $gte: 2 },
             },
         },
         {
@@ -29,12 +29,12 @@ router.get('/', async (req, res) => {
                 _id: 0,
                 customerId: '$_id.customerId',
                 productId: '$_id.productId',
-                viewProductCount: 1
+                views: 1
             }
         }
     ])
 
-    const collectionViews = await Event.aggregate([
+    let collectionViews = await Event.aggregate([
         {
             $match: {
                 topic: 'view_collection',
@@ -43,12 +43,12 @@ router.get('/', async (req, res) => {
         {
             $group: {
                 _id: { customerId: '$customerId', collectionId: '$payload.collectionId' },
-                viewCollectionCount: { $sum: 1 },
+                views: { $sum: 1 },
             },
         },
         {
             $match: {
-                viewCollectionCount: { $gte: 2 },
+                views: { $gte: 2 },
             },
         },
         {
@@ -56,32 +56,43 @@ router.get('/', async (req, res) => {
                 _id: 0,
                 customerId: '$_id.customerId',
                 collectionId: '$_id.collectionId',
-                viewCollectionCount: 1
+                views: 1
             }
         }
     ])
-
-    const customerIds = [...productViews.map(view => view.customerId), ...collectionViews.map(view => view.customerId)]
-
-    console.log(store)
 
     const shopifyApi = new Shopify({
         shopName: store.shop,
         accessToken: store.accessToken
     })
 
+    const customerIds = [...productViews.map(view => view.customerId), ...collectionViews.map(view => view.customerId)].join(',')
+    const customerFields = ['id', 'first_name', 'last_name', 'orders_count'].join(',')
+
     const customers = await shopifyApi.customer.list({
-        ids: customerIds.join(','),
+        ids: customerIds,
+        fields: customerFields,
     })
+
+    const productIds = [...productViews.map(view => view.productId), ...collectionViews.map(view => view.productId)].join(',')
+    const productFields = ['id', 'title', 'image'].join(',')
+
+    let products = await shopifyApi.product.list({
+        ids: productIds,
+        fields: productFields,
+    })
+
+    products = products.map(product => ({...product, image: product.image.src}))
 
     productViews = productViews.map(view => ({
         ...view,
-        customer: customers.find(customer => customer.id == view.customerId)
+        customer: customers.find(customer => customer.id == view.customerId),
+        product: products.find(product => product.id == view.productId),
     }))
 
     collectionViews = collectionViews.map(view => ({
         ...view,
-        customer: customers.find(customer => customer.id == view.customerId)
+        customer: customers.find(customer => customer.id == view.customerId),
     }))
 
     return res.json({

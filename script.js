@@ -6,9 +6,11 @@ const apiUrl = 'https://the-pingme-api.herokuapp.com/shopify'
 
 const isSpam = () => {
 
-  const previousTimestamp = localStorage.getItem(location.pathname)
+  // const previousTimestamp = localStorage.getItem(location.pathname)
 
-  return previousTimestamp && ((Date.now() - previousTimestamp) / 1000) < 5
+  // return previousTimestamp && ((Date.now() - previousTimestamp) / 1000) < 5
+  
+  return false
 
 }
 
