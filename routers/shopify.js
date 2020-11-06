@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const Shopify = require('shopify-api-node')
-const { Store, Event } = require('../models')
+const { Store, Event, CustomerProduct } = require('../models')
 
 router.get('/populate', async (_, res) => {
 
@@ -77,13 +77,23 @@ router.get('/products/:productId/view', async (req, res) => {
 
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
-    await Event.create({
+    // await Event.create({
+    //     shop,
+    //     customerId,
+    //     topic: 'view_product',
+    //     payload: {
+    //         productId,
+    //     }
+    // })
+
+    await CustomerProduct.findOneAndUpdate({
         shop,
         customerId,
-        topic: 'view_product',
-        payload: {
-            productId,
-        }
+        productId
+    }, {
+        $push: { views: Date.now() },
+    }, {
+        upsert: true,
     })
 
     return res.sendStatus(200)
@@ -111,13 +121,23 @@ router.get('/products/:productId/cart', async (req, res) => {
 
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
-    await Event.create({
+    // await Event.create({
+    //     shop,
+    //     customerId,
+    //     topic: 'add_to_cart',
+    //     payload: {
+    //         productId,
+    //     }
+    // })
+
+    await CustomerProduct.findOneAndUpdate({
         shop,
         customerId,
-        topic: 'add_to_cart',
-        payload: {
-            productId,
-        }
+        productId,
+    }, {
+        addedToCartAt: Date.now(),
+    }, {
+        upsert: true,
     })
 
     return res.sendStatus(200)
@@ -126,15 +146,25 @@ router.get('/products/:productId/cart', async (req, res) => {
 
 router.get('/search', async (req, res) => {
 
-    const { shop, keyword, customerId } = req.requirePermit(['shop', 'customerId', 'keyword'])
+    const { shop, customerId, productIds } = req.requirePermit(['shop', 'customerId', 'productIds'])
 
-    await Event.create({
+    // await Event.create({
+    //     shop,
+    //     customerId,
+    //     topic: 'search',
+    //     payload: {
+    //         keyword,
+    //     }
+    // })
+
+    await CustomerProduct.updateMany({
         shop,
         customerId,
-        topic: 'search',
-        payload: {
-            keyword,
-        }
+        productId: { $in: productIds }
+    }, {
+        $push: { searches: Date.now() },
+    }, {
+        upsert: true,
     })
 
     return res.sendStatus(200)

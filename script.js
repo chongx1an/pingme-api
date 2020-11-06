@@ -14,7 +14,17 @@ async function main() {
   if(location.pathname == '/search') {
 
     const keyword = location.search.replace('?q=', '')
-    await $.get(`${API_URL}/search?shop=${Shopify.shop}&customerId=${customerId}&keyword=${keyword}`)
+
+    let links = Array.from(document.querySelectorAll('a'))
+    .map(node => node.getAttribute('href'))
+    .filter(link => link.includes('/products/'))
+    .map(link => `${link.split('?')[0]}.js`)
+
+    const products = await Promise.all(links.map(link => $.getJSON(link)))
+
+    const productIds = products.map(product => product.id)
+
+    await $.get(`${API_URL}/search?shop=${Shopify.shop}&customerId=${customerId}&keyword=${keyword}&productIds=${productIds.join(',')}`)
   
   } else if (location.pathname.startsWith('/products') || location.pathname.startsWith('/collections')) {
   

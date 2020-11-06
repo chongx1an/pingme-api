@@ -12,7 +12,15 @@ const schema = mongoose.Schema({
     },
     topic: {
         type: String,
-        enum: ['view_home', 'view_product', 'view_collection', 'search', 'add_to_cart', 'begin_checkout', 'purchased'],
+        enum: [
+            'view_home',
+            'view_product',
+            'view_collection',
+            'search',
+            'add_to_cart',
+            'begin_checkout',
+            'purchased',
+        ],
         required: true,
     },
     payload: Object,

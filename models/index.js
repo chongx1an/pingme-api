@@ -6,4 +6,5 @@ module.exports = {
     Product: require('./product'),
     Collection: require('./collection'),
     Event: require('./event'),
+    CustomerProduct: require('./customer-product')
 }
