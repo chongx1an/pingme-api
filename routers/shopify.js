@@ -124,6 +124,23 @@ router.get('/products/:productId/cart', async (req, res) => {
 
 })
 
+router.get('/search', async (req, res) => {
+
+    const { shop, keyword, customerId } = req.requirePermit(['shop', 'customerId', 'keyword'])
+
+    await Event.create({
+        shop,
+        customerId,
+        topic: 'search',
+        payload: {
+            keyword,
+        }
+    })
+
+    return res.sendStatus(200)
+
+})
+
 router.use('/webhooks', require('../middlewares/verify-shopify-webhook'))
 
 router.post('/webhooks/app/uninstalled', async(req, res) => {
@@ -152,7 +169,7 @@ router.post('/webhooks/app/uninstalled', async(req, res) => {
 
 router.post('/webhooks/checkouts/create', async(req, res) => {
 
-    const params = req.requirePermit(['customer', 'line_items'])
+    const params = req.requirePermit(['id', 'customer', 'line_items'])
 
     const shop = req.get('X-Shopify-Shop-Domain')
 
@@ -161,6 +178,7 @@ router.post('/webhooks/checkouts/create', async(req, res) => {
         customerId: params.customer.id,
         topic: 'begin_checkout',
         payload: {
+            checkoutId: params.id,
             productId: item.product_id,
         },
     }))
