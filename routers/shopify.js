@@ -44,10 +44,15 @@ router.post('/auth', async (req, res) => {
             format: 'json',
         }),
         shopifyApi.webhook.create({
+            topic: 'checkouts/create',
+            address: 'https://the-pingme-api.herokuapp.com/shopify/webhooks/checkouts/create',
+            format: 'json',
+        }),
+        shopifyApi.webhook.create({
             topic: 'orders/create',
             address: 'https://the-pingme-api.herokuapp.com/shopify/webhooks/orders/create',
             format: 'json',
-        })
+        }),
     ])
 
     return res.sendStatus(200)

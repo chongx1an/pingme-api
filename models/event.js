@@ -16,6 +16,7 @@ const schema = mongoose.Schema({
         required: true,
     },
     payload: Object,
+    
 }, {
     timestamps: true,
 })
