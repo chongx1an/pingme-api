@@ -179,7 +179,7 @@ router.get('/search', async (req, res) => {
     await CustomerProduct.updateMany({
         shop,
         customerId,
-        productId: { $in: productIds }
+        productId: { $in: productIds.split(',') }
     }, {
         $inc: { 'search.count': 1 },
         $push: { 'search.at': Date.now() },
