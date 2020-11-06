@@ -19,6 +19,7 @@ async function main() {
   } else if (location.pathname.startsWith('/products') || location.pathname.startsWith('/collections')) {
   
     const template = location.pathname.split('/').reverse()[1]
+    const handle = location.pathname.split('/').pop()
   
     if (template == 'products') {
 
