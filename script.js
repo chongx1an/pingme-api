@@ -1,66 +1,50 @@
 const customerId = __st ? __st.cid : null
-
-const template = location.pathname.split('/').reverse()[1]
-
-const apiUrl = 'https://the-pingme-api.herokuapp.com/shopify'
+const API_URL = 'https://the-pingme-api.herokuapp.com/shopify'
 
 const isSpam = () => {
-
   // const previousTimestamp = localStorage.getItem(location.pathname)
-
   // return previousTimestamp && ((Date.now() - previousTimestamp) / 1000) < 5
-
   return false
+}
+
+async function main() {
+
+  let res
+
+  if(location.pathname == '/search') {
+
+    const keyword = location.search.replace('?q=', '')
+    await $.get(`${API_URL}/search?shop=${Shopify.shop}&customerId=${customerId}&keyword=${keyword}`)
+  
+  } else if (location.pathname.startsWith('/products') || location.pathname.startsWith('/collections')) {
+  
+    const template = location.pathname.split('/').reverse()[1]
+  
+    if (template == 'products') {
+
+      // View product event
+      res = await $.getJSON(`/products/${handle}.json`)
+      await $.get(`${API_URL}/products/${res.product.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
+
+      // Add to cart event
+      const addToCartButton = document.querySelector('btn product-form__cart-submit')
+        
+      addToCartButton.addEventListener('click', async () => {
+        await $.get(`${API_URL}/products/${res.product.id}/cart?shop=${Shopify.shop}&customerId=${customerId}`)
+      })
+  
+    } else if (template == 'collections') {
+
+      // View collection event
+      res = await $.getJSON(`/${template}/${handle}.json`)
+      await $.get(`${API_URL}/collections/${res.collection.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
+  
+    }
+  
+  }
 
 }
 
 if(customerId && !isSpam()) {
-
-  // localStorage.clear()
-  // localStorage.setItem(location.pathname, Date.now())
-
-  let handle
-
-  switch (template) {
-
-    case '':
-
-      // View home event
-      $.get(`${apiUrl}/home/view?shop=${Shopify.shop}&customerId=${customerId}`)
-      
-    break
-
-    case 'products':
-
-      handle = location.pathname.split('/').pop()
-
-      $.getJSON(`/products/${handle}.json`).then(res => {
-
-        // View product event
-        $.get(`${apiUrl}/products/${res.product.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
-
-        // Add to cart event
-        document.getElementsByClassName('btn product-form__cart-submit')[0].addEventListener('click', function() {
-          
-          $.get(`${apiUrl}/products/${res.product.id}/cart?shop=${Shopify.shop}&customerId=${customerId}`)
-
-        })
-
-      })
-
-    break
-
-    case 'collections':
-
-      handle = location.pathname.split('/').pop()
-
-      // View collection event
-      $.getJSON(`/${template}/${handle}.json`, res => {
-        $.get(`${apiUrl}/collections/${res.collection.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
-      })
-
-    break
-
-  }
-
+  main()
 }
