@@ -91,10 +91,8 @@ router.get('/products/:productId/view', async (req, res) => {
         customerId,
         productId
     }, {
-        view: {
-            $inc: { count: 1 },
-            $push: { at: Date.now() },
-        },
+        $inc: { 'view.count': 1 },
+        $push: { 'view.at': Date.now() },
     }, {
         upsert: true,
     })
@@ -183,10 +181,8 @@ router.get('/search', async (req, res) => {
         customerId,
         productId: { $in: productIds }
     }, {
-        search: {
-            $inc: { count: 1 },
-            $push: { at: Date.now() },
-        },
+        $inc: { 'search.count': 1 },
+        $push: { 'search.at': Date.now() },
     }, {
         upsert: true,
     })
