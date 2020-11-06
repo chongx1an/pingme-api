@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const Shopify = require('shopify-api-node')
-const { Store, Event, CustomerProduct } = require('../models')
+const { Store, Event, CustomerProduct, ProductView } = require('../models')
 
 router.get('/populate', async (_, res) => {
 
@@ -59,40 +59,17 @@ router.post('/auth', async (req, res) => {
 
 })
 
-router.get('/home/view', async (req, res) => {
-
-    const { shop, customerId } = req.requirePermit(['shop', 'customerId'])
-
-    await Event.create({
-        shop,
-        customerId,
-        topic: 'view_home',
-    })
-
-    return res.sendStatus(200)
-
-})
-
 router.get('/products/:productId/view', async (req, res) => {
 
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
-    // await Event.create({
-    //     shop,
-    //     customerId,
-    //     topic: 'view_product',
-    //     payload: {
-    //         productId,
-    //     }
-    // })
-
-    await CustomerProduct.findOneAndUpdate({
+    await ProductView.findOneAndUpdate({
         shop,
         customerId,
-        productId
+        productId,
     }, {
-        $inc: { 'view.count': 1 },
-        $push: { 'view.at': Date.now() },
+        $inc: { count: 1 },
+        $push: { history: Date.now() },
     }, {
         upsert: true,
     })
@@ -122,21 +99,12 @@ router.get('/products/:productId/cart', async (req, res) => {
 
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
-    // await Event.create({
-    //     shop,
-    //     customerId,
-    //     topic: 'add_to_cart',
-    //     payload: {
-    //         productId,
-    //     }
-    // })
-
-    await CustomerProduct.findOneAndUpdate({
+    await ProductView.findOneAndUpdate({
         shop,
         customerId,
         productId,
     }, {
-        addedToCartAt: Date.now(),
+        inCart: true,
     }, {
         upsert: true,
     })
@@ -149,45 +117,15 @@ router.delete('/products/:productId/cart', async (req, res) => {
 
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
 
-    await CustomerProduct.findOneAndUpdate({
+    await ProductView.findOneAndUpdate({
         shop,
         customerId,
         productId,
     }, {
-        cart: {
-            addedAt: Date.now(),
-        },
+        inCart: false,
     }, {
         upsert: true,
     })
-
-    return res.sendStatus(200)
-
-})
-
-router.get('/search', async (req, res) => {
-
-    const { shop, customerId, productIds } = req.requirePermit(['shop', 'customerId', 'productIds'])
-
-    // await Event.create({
-    //     shop,
-    //     customerId,
-    //     topic: 'search',
-    //     payload: {
-    //         keyword,
-    //     }
-    // })
-
-    await Promise.all(productIds.split(',').map(productId => CustomerProduct.findOneAndUpdate({
-        shop,
-        customerId,
-        productId
-    }, {
-        $inc: { 'search.count': 1 },
-        $push: { 'search.at': Date.now() },
-    }, {
-        upsert: true,
-    })))
 
     return res.sendStatus(200)
 
@@ -236,19 +174,6 @@ router.post('/webhooks/checkouts/create', async(req, res) => {
     // }))
 
     // await Event.insertMany(data)
-
-    await Promise.all(params.line_items.map(item => CustomerProduct.findOneAndUpdate({
-        shop: params.shop,
-        customerId: params.customer.id,
-        productId: item.product_id,
-    }, {
-        checkout: {
-            id: params.id,
-            at: Date.now(),
-        },
-    }, {
-        upsert: true,
-    })))
     
     return res.sendStatus(200)
 
@@ -260,24 +185,24 @@ router.post('/webhooks/orders/create', async(req, res) => {
 
     const shop = req.get('X-Shopify-Shop-Domain')
 
-    const productIds = params.line_items.map(item => item.product_id)
+    // const productIds = params.line_items.map(item => item.product_id)
 
-    await Event.deleteMany({
-        shop,
-        customerId: params.customer.id,
-        'payload.productId': { $in: productIds },
-    })
+    // await Event.deleteMany({
+    //     shop,
+    //     customerId: params.customer.id,
+    //     'payload.productId': { $in: productIds },
+    // })
 
-    const data = productIds.map(productId => ({
-        shop,
-        customerId: params.customer.id,
-        topic: 'purchased',
-        payload: {
-            productId,
-        }
-    }))
+    // const data = productIds.map(productId => ({
+    //     shop,
+    //     customerId: params.customer.id,
+    //     topic: 'purchased',
+    //     payload: {
+    //         productId,
+    //     }
+    // }))
 
-    await Event.insertMany(data)
+    // await Event.insertMany(data)
 
     return res.sendStatus(200)
 

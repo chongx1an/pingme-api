@@ -1,3 +1,4 @@
+console.log('loaded')
 const customerId = __st ? __st.cid : null
 const API_URL = 'https://the-pingme-api.herokuapp.com/shopify'
 
@@ -13,18 +14,20 @@ async function main() {
 
   if(location.pathname == '/search') {
 
-    const keyword = location.search.replace('?q=', '')
+    // const keyword = location.search.replace('?q=', '')
 
-    let links = Array.from(document.querySelectorAll('a'))
-    .map(node => node.getAttribute('href'))
-    .filter(link => link.includes('/products/'))
-    .map(link => `${link.split('?')[0]}.js`)
+    // // Extract search results
+    // let links = Array.from(document.querySelectorAll('a'))
+    // .map(node => node.getAttribute('href'))
+    // .filter(link => link.includes('/products/'))
+    // .map(link => `${link.split('?')[0]}.js`)
 
-    if(links.length < 5) {
-      const products = await Promise.all(links.map(link => $.getJSON(link)))
-      const productIds = products.map(product => product.id)
-      await $.get(`${API_URL}/search?shop=${Shopify.shop}&customerId=${customerId}&keyword=${keyword}&productIds=${productIds.join(',')}`)
-    }
+    // // Search product event if results less than 5
+    // if(links.length < 5) {
+    //   const products = await Promise.all(links.map(link => $.getJSON(link)))
+    //   const productIds = products.map(product => product.id)
+    //   await $.get(`${API_URL}/search?shop=${Shopify.shop}&customerId=${customerId}&keyword=${keyword}&productIds=${productIds.join(',')}`)
+    // }
   
   } else if (location.pathname.startsWith('/products') || location.pathname.startsWith('/collections')) {
   
@@ -46,9 +49,9 @@ async function main() {
   
     } else if (template == 'collections') {
 
-      // View collection event
-      res = await $.getJSON(`/${template}/${handle}.json`)
-      await $.get(`${API_URL}/collections/${res.collection.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
+      // // View collection event
+      // res = await $.getJSON(`/${template}/${handle}.json`)
+      // await $.get(`${API_URL}/collections/${res.collection.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
   
     }
   

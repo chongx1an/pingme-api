@@ -3,5 +3,6 @@ module.exports = {
     Thread: require('./thread'),
     Store: require('./store'),
     Event: require('./event'),
-    CustomerProduct: require('./customer-product')
+    CustomerProduct: require('./customer-product'),
+    ProductView: require('./product-view'),
 }
