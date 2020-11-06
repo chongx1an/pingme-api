@@ -176,7 +176,7 @@ router.get('/search', async (req, res) => {
     //     }
     // })
 
-    await Promise.all(productIds.map(productId => CustomerProduct.findOneAndUpdate({
+    await Promise.all(productIds.split(',').map(productId => CustomerProduct.findOneAndUpdate({
         shop,
         customerId,
         productId
@@ -186,7 +186,7 @@ router.get('/search', async (req, res) => {
     }, {
         upsert: true,
     })))
-    
+
     return res.sendStatus(200)
 
 })
