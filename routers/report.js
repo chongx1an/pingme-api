@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const Shopify = require('shopify-api-node')
-const { Event, CustomerProduct } = require('../models')
+const { Event, CustomerProduct, ProductView } = require('../models')
 const Store = require('../models/store')
 const moment = require('moment')
 
@@ -10,25 +10,30 @@ router.get('/', async (_, res) => {
 
     const store = await Store.findOne({ shop })
 
-    const date = new Date()
-    date.setDate(date.getDate() - 3)
-
-    let records = await CustomerProduct.find({
-        $or: [
-            {
-                'view.count': { $gte: 2 },
-            },
-            {
-                'search.count': { $gte: 2 },
-            },
-            {
-                addedToCartAt: { $lte: date },
-            },
-            {
-                checkoutAt: { $lte: date },
-            },
-        ]
-    })
+    let productViews = await ProductView.aggregate([
+        {
+            $match: {
+                shop: store.shop,
+                count: { $gte: 2 },
+            }
+        },
+        {
+            $group: {
+                _id: { customerId: '$customerId', productId: '$productId' },
+                count: { $first: '$count' },
+                history: { $first: '$history' },
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                customerId: '$_id.customerId',
+                productId: '$_id.productId',
+                count: 1,
+                history: 1,
+            }
+        }
+    ])
 
 
     const shopifyApi = new Shopify({
@@ -38,7 +43,7 @@ router.get('/', async (_, res) => {
 
 
     // List customers
-    const customerIds = records.map(record => record.customerId).join(',')
+    const customerIds = productViews.map(productView => productView.customerId).join(',')
     const customerFields = ['id', 'first_name', 'last_name', 'email', 'phone', 'orders_count'].join(',')
 
     const customers = await shopifyApi.customer.list({
@@ -48,7 +53,7 @@ router.get('/', async (_, res) => {
 
 
     // List products
-    const productIds = records.map(record => record.productId).join(',')
+    const productIds = productViews.map(productView => productView.productId).join(',')
     const productFields = ['id', 'title', 'image'].join(',')
 
     let products = await shopifyApi.product.list({
@@ -61,40 +66,20 @@ router.get('/', async (_, res) => {
         image: product.image.src
     }))
 
-    records = records.map(record => {
+    productViews = productViews.map(view => {
 
-        record = record.toJSON()
+        view.customer = customers.find(customer => customer.id == view.customerId)
+        view.product = products.find(product => product.id == view.productId)
+        view.interval = moment(view.history[view.history.length - 1]).from(view.history[0])
 
-        record.customer = customers.find(customer => customer.id == record.customerId)
-        record.product = products.find(product => product.id == record.productId)
+        delete view.customerId
+        delete view.productId
 
-        record.addToCart = record.addedToCartAt ? {
-            at: record.addedToCartAt,
-            ago: moment(record.addedToCartAt).fromNow(),
-        } : null
-
-        delete record.addedToCartAt
-
-        record.checkout = record.checkoutAt ? {
-            at: record.checkoutAt,
-            ago: moment(record.checkoutAt).fromNow(),
-        } : null
-
-        delete record.checkoutAt
-        
-        if(record.view.count > 1) {
-            record.view.maxInterval = moment(record.view.at[record.view.at.length - 1]).from(record.view.at[0])
-        }
-
-        if(record.search.count > 1) {
-            record.search.maxInterval = moment(record.search.at[record.search.at.length - 1]).from(record.search.at[0])
-        }
-
-        return record
+        return view
 
     })
 
-    return res.json({ results: records })
+    return res.json({ results: productViews })
 
 })
 
