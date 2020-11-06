@@ -176,19 +176,17 @@ router.get('/search', async (req, res) => {
     //     }
     // })
 
-    console.log(productIds)
-
-    await CustomerProduct.updateMany({
+    await Promise.all(productIds.map(productId => CustomerProduct.findOneAndUpdate({
         shop,
         customerId,
-        productId: { $in: productIds.split(',') }
+        productId
     }, {
         $inc: { 'search.count': 1 },
         $push: { 'search.at': Date.now() },
     }, {
         upsert: true,
-    })
-
+    })))
+    
     return res.sendStatus(200)
 
 })
