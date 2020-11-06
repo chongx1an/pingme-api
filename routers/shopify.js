@@ -176,6 +176,8 @@ router.get('/search', async (req, res) => {
     //     }
     // })
 
+    console.log(productIds)
+
     await CustomerProduct.updateMany({
         shop,
         customerId,
