@@ -9,7 +9,7 @@ module.exports = async (req, res, next) => {
     // const body = await getRawBody(req)
 
     const hashDigest = crypto.createHmac('sha256', shopifyConfig.apiSecretKey)
-    .update(req.body, 'utf8')
+    .update(JSON.stringify(req.body), 'utf8')
     .digest('base64')
 
     console.log([hmac, hashDigest])
