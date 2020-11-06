@@ -6,10 +6,10 @@ module.exports = async (req, res, next) => {
 
     const hmac = req.get('X-Shopify-Hmac-Sha256')
 
-    const body = await getRawBody(req)
+    // const body = await getRawBody(req)
 
     const hashDigest = crypto.createHmac('sha256', shopifyConfig.apiSecretKey)
-    .update(Buffer.from(body), 'utf8')
+    .update(req.body, 'utf8')
     .digest('base64')
 
     console.log([hmac, hashDigest])
