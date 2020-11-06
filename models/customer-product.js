@@ -15,14 +15,20 @@ const schema = mongoose.Schema({
         required: true,
     },
     
-    views: {
-        type: [Date],
-        default: [],
+    view: {
+        count: {
+            type: Number,
+            default: 0,
+        },
+        at: [Date],
     },
 
-    searches: {
-        type: [Date],
-        default: [],
+    search: {
+        count: {
+            type: Number,
+            default: 0,
+        },
+        at: [Date],
     },
 
     addedToCartAt: Date,

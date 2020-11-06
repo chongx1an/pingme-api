@@ -144,6 +144,24 @@ router.get('/products/:productId/cart', async (req, res) => {
 
 })
 
+router.delete('/products/:productId/cart', async (req, res) => {
+
+    const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])
+
+    await CustomerProduct.findOneAndUpdate({
+        shop,
+        customerId,
+        productId,
+    }, {
+        addedToCartAt: null,
+    }, {
+        upsert: true,
+    })
+
+    return res.sendStatus(200)
+
+})
+
 router.get('/search', async (req, res) => {
 
     const { shop, customerId, productIds } = req.requirePermit(['shop', 'customerId', 'productIds'])
