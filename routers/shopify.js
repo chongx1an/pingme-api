@@ -173,8 +173,6 @@ router.post('/webhooks/checkouts/create', async(req, res) => {
 
 router.post('/webhooks/orders/create', async(req, res) => {
 
-    return res.sendStatus(200)
-
     const params = req.requirePermit(['id', 'customer', 'line_items'])
 
     const shop = req.get('X-Shopify-Shop-Domain')
