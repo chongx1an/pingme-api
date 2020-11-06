@@ -1,5 +1,3 @@
-const customerId = __st ? __st.cid : null
-
 const template = location.pathname.split('/').reverse()[1]
 
 const apiUrl = 'https://the-pingme-api.herokuapp.com/shopify'
@@ -14,7 +12,7 @@ const isSpam = () => {
 
 }
 
-if(customerId && !isSpam()) {
+if(__st.cid && !isSpam()) {
 
   // localStorage.clear()
   // localStorage.setItem(location.pathname, Date.now())
@@ -26,7 +24,7 @@ if(customerId && !isSpam()) {
     case '':
 
       // View home event
-      $.get(`${apiUrl}/home/view?shop=${Shopify.shop}&customerId=${customerId}`)
+      $.get(`${apiUrl}/home/view?shop=${Shopify.shop}&customerId=${__st.cid}`)
       
     break
 
@@ -37,12 +35,12 @@ if(customerId && !isSpam()) {
       $.getJSON(`/products/${handle}.json`).then(res => {
 
         // View product event
-        $.get(`${apiUrl}/products/${res.product.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
+        $.get(`${apiUrl}/products/${res.product.id}/view?shop=${Shopify.shop}&customerId=${__st.cid}`)
 
         // Add to cart event
         document.getElementsByClassName('btn product-form__cart-submit')[0].addEventListener('click', function() {
           
-          $.get(`${apiUrl}/products/${res.product.id}/cart?shop=${Shopify.shop}&customerId=${customerId}`)
+          $.get(`${apiUrl}/products/${res.product.id}/cart?shop=${Shopify.shop}&customerId=${__st.cid}`)
 
         })
 
@@ -56,7 +54,7 @@ if(customerId && !isSpam()) {
 
       // View collection event
       $.getJSON(`/${template}/${handle}.json`, res => {
-        $.get(`${apiUrl}/collections/${res.collection.id}/view?shop=${Shopify.shop}&customerId=${customerId}`)
+        $.get(`${apiUrl}/collections/${res.collection.id}/view?shop=${Shopify.shop}&customerId=${__st.cid}`)
       })
 
     break
