@@ -154,7 +154,9 @@ router.delete('/products/:productId/cart', async (req, res) => {
         customerId,
         productId,
     }, {
-        addedToCartAt: null,
+        cart: {
+            addedAt: Date.now(),
+        },
     }, {
         upsert: true,
     })
@@ -223,17 +225,30 @@ router.post('/webhooks/checkouts/create', async(req, res) => {
 
     const shop = req.get('X-Shopify-Shop-Domain')
 
-    const data = params.line_items.map(item => ({
-        shop,
-        customerId: params.customer.id,
-        topic: 'begin_checkout',
-        payload: {
-            checkoutId: params.id,
-            productId: item.product_id,
-        },
-    }))
+    // const data = params.line_items.map(item => ({
+    //     shop,
+    //     customerId: params.customer.id,
+    //     topic: 'begin_checkout',
+    //     payload: {
+    //         checkoutId: params.id,
+    //         productId: item.product_id,
+    //     },
+    // }))
 
-    await Event.insertMany(data)
+    // await Event.insertMany(data)
+
+    await Promise.all(params.line_items.map(item => CustomerProduct.findOneAndUpdate({
+        shop: params.shop,
+        customerId: params.customer.id,
+        productId: item.product_id,
+    }, {
+        checkout: {
+            id: params.id,
+            at: Date.now(),
+        },
+    }, {
+        upsert: true,
+    })))
     
     return res.sendStatus(200)
 

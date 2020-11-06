@@ -2,13 +2,18 @@ const router = require('express').Router()
 const Shopify = require('shopify-api-node')
 const { Event, CustomerProduct } = require('../models')
 const Store = require('../models/store')
+const moment = require('moment')
 
-router.get('/', async (req, res) => {
+router.get('/', async (_, res) => {
+
+    const shop = 'posta-show-case.myshopify.com'
+
+    const store = await Store.findOne({ shop })
 
     const date = new Date()
     date.setDate(date.getDate() - 3)
 
-    let customerProducts = await CustomerProduct.find({
+    let records = await CustomerProduct.find({
         $or: [
             {
                 'view.count': { $gte: 2 },
@@ -25,30 +30,71 @@ router.get('/', async (req, res) => {
         ]
     })
 
-    customerProducts = await CustomerProduct.aggregate([
-        {
-            $match: {
-                $or: [
-                    {
-                        'view.count': { $gte: 2 },
-                    },
-                    {
-                        'search.count': { $gte: 2 },
-                    },
-                    {
-                        addedToCartAt: { $lte: date },
-                    },
-                    {
-                        checkoutAt: { $lte: date },
-                    },
-                ]
-            },
-            $addFields: {
-                addedToCartDaysAgo: { $subtract: ['$$NOW', '$addedToCartAt'] },
-                checkoutDaysAgo: { $subtract: ['$$NOW', '$checkoutAt'] },
-            },
+
+    const shopifyApi = new Shopify({
+        shopName: store.shop,
+        accessToken: store.accessToken
+    })
+
+
+    // List customers
+    const customerIds = records.map(record => record.customerId).join(',')
+    const customerFields = ['id', 'first_name', 'last_name', 'email', 'phone', 'orders_count'].join(',')
+
+    const customers = await shopifyApi.customer.list({
+        ids: customerIds,
+        fields: customerFields,
+    })
+
+
+    // List products
+    const productIds = records.map(record => record.productId).join(',')
+    const productFields = ['id', 'title', 'image'].join(',')
+
+    let products = await shopifyApi.product.list({
+        ids: productIds,
+        fields: productFields,
+    })
+
+    products = products.map(product => ({
+        ...product,
+        image: product.image.src
+    }))
+
+    records = records.map(record => {
+
+        record = record.toJSON()
+
+        record.customer = customers.find(customer => customer.id == record.customerId)
+        record.product = products.find(product => product.id == record.productId)
+
+        record.addToCart = record.addedToCartAt ? {
+            at: record.addedToCartAt,
+            ago: moment(record.addedToCartAt).fromNow(),
+        } : null
+
+        delete record.addedToCartAt
+
+        record.checkout = record.checkoutAt ? {
+            at: record.checkoutAt,
+            ago: moment(record.checkoutAt).fromNow(),
+        } : null
+
+        delete record.checkoutAt
+        
+        if(record.view.count > 1) {
+            record.view.maxInterval = moment(record.view.at[record.view.at.length - 1]).from(record.view.at[0])
         }
-    ])
+
+        if(record.search.count > 1) {
+            record.search.maxInterval = moment(record.search.at[record.search.at.length - 1]).from(record.search.at[0])
+        }
+
+        return record
+
+    })
+
+    return res.json({ results: records })
 
 })
 

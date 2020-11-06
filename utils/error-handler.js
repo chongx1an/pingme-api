@@ -39,16 +39,6 @@ process.on('unhandledRejection', async function(reason, promise) {
 
     console.log(reason)
 
-    let array = []
-
-    Object.keys(reason).forEach(key => {
-        if(typeof reason[key] == 'string') {
-            array.push(reason[key])
-        }
-    })
-
-    const text = array.reduce((a, b) => a.length > b.length ? a : b)
-
     const blocks = [
         {
             type: 'header',
@@ -64,7 +54,7 @@ process.on('unhandledRejection', async function(reason, promise) {
             type: 'section',
             text: {
                 type: 'mrkdwn',
-                text,
+                text: JSON.stringify(reason),
             },
         }
     ]

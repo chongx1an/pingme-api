@@ -31,9 +31,17 @@ const schema = mongoose.Schema({
         at: [Date],
     },
 
-    addedToCartAt: Date,
+    cart: {
+        addedAt: Date,
+    },
 
-    checkoutAt: Date,
+    checkout: {
+        id: {
+            type: Number,
+            required: true,
+        },
+        at: Date,
+    }
     
 }, {
     timestamps: true,
