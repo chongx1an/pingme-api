@@ -40,7 +40,7 @@ async function main() {
       // Add to cart event
       const addToCartButton = document.querySelector('btn product-form__cart-submit')
         
-      addToCartButton.addEventListener('click', function() {
+      addToCartButton.addEventListener('click', async function() {
         await $.get(`${API_URL}/products/${res.product.id}/cart?shop=${Shopify.shop}&customerId=${customerId}`)
       })
   
