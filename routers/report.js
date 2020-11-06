@@ -1,7 +1,56 @@
 const router = require('express').Router()
 const Shopify = require('shopify-api-node')
-const { Event } = require('../models')
+const { Event, CustomerProduct } = require('../models')
 const Store = require('../models/store')
+
+router.get('/', async (req, res) => {
+
+    const date = new Date()
+    date.setDate(date.getDate() - 3)
+
+    let customerProducts = await CustomerProduct.find({
+        $or: [
+            {
+                'view.count': { $gte: 2 },
+            },
+            {
+                'search.count': { $gte: 2 },
+            },
+            {
+                addedToCartAt: { $lte: date },
+            },
+            {
+                checkoutAt: { $lte: date },
+            },
+        ]
+    })
+
+    customerProducts = await CustomerProduct.aggregate([
+        {
+            $match: {
+                $or: [
+                    {
+                        'view.count': { $gte: 2 },
+                    },
+                    {
+                        'search.count': { $gte: 2 },
+                    },
+                    {
+                        addedToCartAt: { $lte: date },
+                    },
+                    {
+                        checkoutAt: { $lte: date },
+                    },
+                ]
+            },
+            $addFields: {
+                addedToCartDaysAgo: { $subtract: ['$$NOW', '$addedToCartAt'] },
+                checkoutDaysAgo: { $subtract: ['$$NOW', '$checkoutAt'] },
+            },
+        }
+    ])
+
+})
 
 router.get('/', async (req, res) => {
 

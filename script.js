@@ -20,11 +20,11 @@ async function main() {
     .filter(link => link.includes('/products/'))
     .map(link => `${link.split('?')[0]}.js`)
 
-    const products = await Promise.all(links.map(link => $.getJSON(link)))
-
-    const productIds = products.map(product => product.id)
-
-    await $.get(`${API_URL}/search?shop=${Shopify.shop}&customerId=${customerId}&keyword=${keyword}&productIds=${productIds.join(',')}`)
+    if(links.length < 5) {
+      const products = await Promise.all(links.map(link => $.getJSON(link)))
+      const productIds = products.map(product => product.id)
+      await $.get(`${API_URL}/search?shop=${Shopify.shop}&customerId=${customerId}&keyword=${keyword}&productIds=${productIds.join(',')}`)
+    }
   
   } else if (location.pathname.startsWith('/products') || location.pathname.startsWith('/collections')) {
   
@@ -40,7 +40,7 @@ async function main() {
       // Add to cart event
       const addToCartButton = document.querySelector('btn product-form__cart-submit')
         
-      addToCartButton.addEventListener('click', async () => {
+      addToCartButton.addEventListener('click', function() {
         await $.get(`${API_URL}/products/${res.product.id}/cart?shop=${Shopify.shop}&customerId=${customerId}`)
       })
   
