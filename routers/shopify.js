@@ -16,16 +16,23 @@ router.post('/auth', async (req, res) => {
 
     const { shop, accessToken } = req.requirePermit(['shop', 'accessToken'])
 
-    // Upsert store in DB
-    const store = await Store.findOneAndUpdate({
+    let store = await Store.findOne({ provider: 'shopify', shop })
+
+    if(store) {
+
+        await store.update({
+            deleted: false,
+            accessToken
+        })
+
+        return res.sendStatus(200)
+
+    }
+
+    store = await Store.create({
         provider: 'shopify',
         shop,
-    }, {
         accessToken,
-        deleted: false,
-    }, {
-        new: true,
-        upsert: true,
     })
 
     const shopifyApi = new Shopify({

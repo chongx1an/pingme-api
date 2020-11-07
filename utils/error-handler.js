@@ -61,6 +61,7 @@ process.on('unhandledRejection', async function(reason, promise) {
 
     await Slack.chat.postMessage({
         channel: '#errors',
+        text: 'Error',
         blocks,
     })
 

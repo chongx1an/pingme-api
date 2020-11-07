@@ -27,6 +27,6 @@ global.io = require('socket.io').listen(server)
 
 global.io.on('connection', () => console.log('Socket connected'))
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3001
 
 server.listen(port, () => console.log('Server is listening on port ' + port))
