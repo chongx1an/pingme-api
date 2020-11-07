@@ -3,7 +3,6 @@ const Shopify = require('shopify-api-node')
 const { Event, CustomerProduct, ProductView } = require('../models')
 const Store = require('../models/store')
 const moment = require('moment')
-const util = require('util')
 
 router.get('/', async (_, res) => {
 
