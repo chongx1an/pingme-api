@@ -75,7 +75,7 @@ router.get('/', async (_, res) => {
         }))
         .map(product => ({
             ...product,
-            inverval: moment(product.history[product.history.length - 1]).from(product.history[0]),
+            interval: moment(product.history[product.history.length - 1]).from(product.history[0]),
         }))
 
         delete view.data
