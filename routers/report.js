@@ -77,6 +77,8 @@ router.get('/', async (req, res) => {
 
         view.product = products.find(product => product.id == view._id)
 
+        view.totalViews = view.data.map(datum => datum.count).reduce((acc, val) => acc + val)
+
         view.customersCount = view.data.length
 
         let histories = []
