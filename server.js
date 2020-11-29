@@ -10,11 +10,7 @@ require('./database')
 const app  = express()
 require('./ext/app')(app)
 
-app.use(express.json({
-    type: '*/*',
-    limit: '50mb',
-    verify: (req, _, buf) => req.rawBody = buf
-}))
+app.use(express.json())
 
 app.use(cors())
 app.use(express.urlencoded({ extended: true }))

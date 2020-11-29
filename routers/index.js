@@ -5,6 +5,7 @@ const router = require('express').Router()
 router.use('/chat', require('./chat'))
 router.use('/shopify', require('./shopify'))
 router.use('/reports', require('./report'))
+router.use('/customers', require('./customer'))
 router.use('/slack', require('./slack'))
 
 module.exports = router

@@ -3,6 +3,8 @@ const Slack = new WebClient(process.env.SLACK_TOKEN)
 
 process.on('uncaughtException', async function (err) {
 
+    console.log(err)
+
     let errStack = err.stack.split('\n')
     const firstLine = errStack.shift()
 
