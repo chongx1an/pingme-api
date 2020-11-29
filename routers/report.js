@@ -77,15 +77,17 @@ router.get('/', async (req, res) => {
 
         view.product = products.find(product => product.id == view._id)
 
-        view.customers = view.data
-        .map(datum => ({
-            ...datum,
-            ...customers.find(customer => customer.id == datum.customerId)
-        }))
-        .map(customer => ({
-            ...customer,
-            interval: moment(customer.history[customer.history.length - 1]).from(customer.history[0]),
-        }))
+        view.customersCount = view.data.length
+
+        let histories = []
+
+        view.data.forEach(datum => histories = histories.concat(datum.history))
+
+        histories = histories.sort()
+
+        view.lastViewed = histories[histories.length - 1]
+
+        view.interval = moment(histories[histories.length - 1]).from(histories[0])
 
         delete view.data
 
