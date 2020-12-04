@@ -66,6 +66,50 @@ router.post('/auth', async (req, res) => {
 
 })
 
+router.post('/customer-groups', async (req, res) => {
+    const { productId, customerIds } = req.requirePermit(['productId', 'customerIds'])
+
+    const shop = 'posta-show-case.myshopify.com'
+
+    const store = await Store.findOne({ shop })
+
+    const shopifyApi = new Shopify({
+        shopName: store.shop,
+        accessToken: store.accessToken
+    })
+
+    const customerFields = ['id', 'tags'].join(',')
+    let customers = await shopifyApi.customer.list({
+        ids: customerIds.join(','),
+        fields: customerFields
+    })
+
+    customers.forEach(async (customer) => {
+
+        let tags = customer.tags.split(",").map(s => s.trim())
+
+        tags = [...new Set([...tags, productId])]
+        
+        let result = await shopifyApi.customer.update(customer.id, {
+            tags: tags,
+        })
+
+
+    })
+
+    const productFields = ['id', 'title'].join(',')
+    let product = await shopifyApi.product.get(productId, {
+        fields: productFields
+    })
+
+    let result = await shopifyApi.customerSavedSearch.create({
+        name: `Viewed ${product.id}`,
+        query: `tag:'${product.id}'`
+    })
+    console.log(result)
+    return res.json({ success: true })
+})
+
 router.get('/products/:productId/view', async (req, res) => {
 
     const { shop, productId, customerId } = req.requirePermit(['shop', 'productId', 'customerId'])

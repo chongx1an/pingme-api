@@ -50,14 +50,6 @@ router.get('/', async (req, res) => {
         })
     })
 
-    customerIds = customerIds.join(',')
-    const customerFields = ['id', 'first_name', 'last_name', 'email', 'phone', 'orders_count'].join(',')
-
-    const customers = await shopifyApi.customer.list({
-        ids: customerIds,
-        fields: customerFields,
-    })
-
     const productIds = views.map(view => view.productId).join(',')
     const productFields = ['id', 'title', 'image'].join(',')
 
@@ -91,6 +83,8 @@ router.get('/', async (req, res) => {
 
         view.interval = moment(histories[histories.length - 1]).from(histories[0])
 
+        view.customerIds = customerIds
+        
         delete view.data
 
         return view
